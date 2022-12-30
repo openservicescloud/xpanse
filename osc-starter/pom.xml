@@ -9,8 +9,8 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>osc-init</artifactId>
-    <name>OSC :: Services :: Init</name>
+    <artifactId>osc-starter</artifactId>
+    <name>OSC :: Services :: Starter</name>
     <version>1.0.0-SNAPSHOT</version>
 
     <properties>
