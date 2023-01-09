@@ -1,8 +1,6 @@
 package org.eclipse.osc.orchestrator.plugin.huaweicloud;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,10 +13,15 @@ public abstract class AtomBuilder {
 
     private static final long WAIT_AND_CHECK_TIME = 5;
     private static final long BUILDING_TIMEOUT_DEFAULT = 100;
+    private static final Integer PRIORITY_LEVEL = 5;
 
     public String name() {
         return "AtomBuilder";
     }
+
+    @Setter
+    @Getter
+    public Integer priority;
 
     @Setter
     @Getter
@@ -88,6 +91,18 @@ public abstract class AtomBuilder {
         return true;
     }
 
+    private List<AtomBuilder> sortToAtomBuilder(List<AtomBuilder> subBuilders){
+        List<AtomBuilder> subBuilderList = new ArrayList<>();
+        for (AtomBuilder subBuilder : subBuilders) {
+            for (Integer priority = 1; priority <= PRIORITY_LEVEL; priority++) {
+                if (subBuilder.getPriority()==priority){
+                    subBuilderList.add(subBuilder);
+                }
+            }
+        }
+        return subBuilderList;
+    }
+
     /**
      * Builders will be started in sequence. Util all the sub builders going to be successful. Then
      * the current builder will start to build.
@@ -97,8 +112,8 @@ public abstract class AtomBuilder {
      */
     public boolean build(BuilderContext ctx) {
         setState(BuilderState.RUNNING);
-
-        for (AtomBuilder subBuilder : subBuilders) {
+        List<AtomBuilder> atomBuilderList = sortToAtomBuilder(subBuilders);
+        for (AtomBuilder subBuilder : atomBuilderList) {
             if (!subBuilder.build(ctx)) {
                 setState(BuilderState.FAILED);
                 log.error("Submit builder: {} failed.", subBuilder.name());

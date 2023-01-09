@@ -12,10 +12,10 @@ public class BuilderFactory {
 
     public Optional<AtomBuilder> createBuilder(String builderType, Ocl ocl) {
         if (builderType.equals(BASIC_BUILDER)) {
-            HuaweiEnvBuilder envBuilder = new HuaweiEnvBuilder(ocl);
-            HuaweiImageBuilder imageBuilder = new HuaweiImageBuilder(ocl);
-            HuaweiResourceBuilder resourceBuilder = new HuaweiResourceBuilder(ocl);
-            HuaweiEnvBuilder envBuilderTail = new HuaweiEnvBuilder(ocl);
+            HuaweiEnvBuilder envBuilder = new HuaweiEnvBuilder(ocl,4);
+            HuaweiImageBuilder imageBuilder = new HuaweiImageBuilder(ocl, 5);
+            HuaweiResourceBuilder resourceBuilder = new HuaweiResourceBuilder(ocl, 3);
+            HuaweiEnvBuilder envBuilderTail = new HuaweiEnvBuilder(ocl, 2);
 
             imageBuilder.addSubBuilder(envBuilder);
             resourceBuilder.addSubBuilder(imageBuilder);

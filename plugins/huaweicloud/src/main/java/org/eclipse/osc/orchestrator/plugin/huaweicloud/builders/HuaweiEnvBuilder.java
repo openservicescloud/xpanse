@@ -21,6 +21,11 @@ public class HuaweiEnvBuilder extends AtomBuilder {
         super(ocl);
     }
 
+    public HuaweiEnvBuilder(Ocl ocl, Integer priority) {
+        super(ocl);
+        this.priority = priority;
+    }
+
     @Override
     public String name() {
         return "Huawei-Cloud-env-Builder";

@@ -16,6 +16,11 @@ public class HuaweiResourceBuilder extends AtomBuilder {
         super(ocl);
     }
 
+    public HuaweiResourceBuilder(Ocl ocl, Integer priority) {
+        super(ocl);
+        this.priority = priority;
+    }
+
     @Override
     public String name() {
         return "Huawei-Cloud-resource-Builder";

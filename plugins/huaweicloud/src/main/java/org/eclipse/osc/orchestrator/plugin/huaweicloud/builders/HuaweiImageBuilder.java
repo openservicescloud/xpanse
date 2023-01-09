@@ -22,6 +22,11 @@ public class HuaweiImageBuilder extends AtomBuilder {
         super(ocl);
     }
 
+    public HuaweiImageBuilder(Ocl ocl, Integer priority) {
+        super(ocl);
+        this.priority = priority;
+    }
+
     @Override
     public String name() {
         return "Huawei-Cloud-image-Builder";
