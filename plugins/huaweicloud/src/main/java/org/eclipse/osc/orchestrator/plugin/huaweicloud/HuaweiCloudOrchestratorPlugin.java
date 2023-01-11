@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.karaf.minho.boot.service.ConfigService;
 import org.apache.karaf.minho.boot.service.ServiceRegistry;
@@ -77,19 +76,11 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin, Servic
         ctx.setConfig(config);
 
         BuilderFactory factory = new BuilderFactory();
-        Optional<AtomBuilder> optionalEnvBuilder = factory.createBuilder(
+        AtomBuilder envBuilder = factory.createBuilder(
             BuilderFactory.ENV_BUILDER, ocl);
-
-        if (optionalEnvBuilder.isEmpty()) {
-            throw new IllegalStateException("EnvBuilder not found.");
-        }
-
-        Optional<AtomBuilder> optionalBasicBuilder = factory.createBuilder(
+        AtomBuilder basicBuilder = factory.createBuilder(
             BuilderFactory.BASIC_BUILDER, ocl);
 
-        if (optionalBasicBuilder.isEmpty()) {
-            throw new IllegalStateException("BasicBuilder not found.");
-        }
         OclResources oclResources = getOclResources(managedServiceName);
         if (oclResources != null && oclResources.getState().equals("active")) {
             log.info("Managed service {} already in active.", managedServiceName);
@@ -100,11 +91,11 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin, Servic
         storeOclResources(managedServiceName, ctx.getOclResources());
 
         try {
-            optionalEnvBuilder.get().build(ctx);
-            optionalBasicBuilder.get().build(ctx);
+            envBuilder.build(ctx);
+            basicBuilder.build(ctx);
         } catch (Exception ex) {
-            optionalEnvBuilder.get().build(ctx);
-            optionalBasicBuilder.get().rollback(ctx);
+            envBuilder.build(ctx);
+            basicBuilder.rollback(ctx);
             throw ex;
         }
         ctx.getOclResources().setState("active");
@@ -126,19 +117,10 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin, Servic
         ctx.setConfig(config);
 
         BuilderFactory factory = new BuilderFactory();
-        Optional<AtomBuilder> optionalEnvBuilder =
-            factory.createBuilder(BuilderFactory.ENV_BUILDER, ocl);
-        if (optionalEnvBuilder.isEmpty()) {
-            throw new IllegalStateException("EnvBuilder not found.");
-        }
-
-        optionalEnvBuilder.get().build(ctx);
-        Optional<AtomBuilder> optionalBasicBuilder = factory.createBuilder(
-            BuilderFactory.BASIC_BUILDER, ocl);
-        if (optionalBasicBuilder.isEmpty()) {
-            throw new IllegalStateException("BasicBuilder not found.");
-        }
-        optionalBasicBuilder.get().rollback(ctx);
+        AtomBuilder envBuilder = factory.createBuilder(BuilderFactory.ENV_BUILDER, ocl);
+        AtomBuilder basicBuilder = factory.createBuilder(BuilderFactory.BASIC_BUILDER, ocl);
+        envBuilder.build(ctx);
+        basicBuilder.rollback(ctx);
 
         storeOclResources(managedServiceName, new OclResources());
     }

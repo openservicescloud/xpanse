@@ -1,6 +1,5 @@
 package org.eclipse.osc.orchestrator.plugin.huaweicloud;
 
-import java.util.Optional;
 import org.eclipse.osc.modules.ocl.loader.Ocl;
 import org.eclipse.osc.orchestrator.plugin.huaweicloud.builders.HuaweiEnvBuilder;
 import org.eclipse.osc.orchestrator.plugin.huaweicloud.builders.HuaweiImageBuilder;
@@ -12,17 +11,16 @@ public class BuilderFactory {
 
     public static final String BASIC_BUILDER = "basic";
 
-    public Optional<AtomBuilder> createBuilder(String builderType, Ocl ocl) {
+    public AtomBuilder createBuilder(String builderType, Ocl ocl) {
         if (builderType.equals(ENV_BUILDER)) {
-            HuaweiEnvBuilder envBuilder = new HuaweiEnvBuilder(ocl);
-            return Optional.of(envBuilder);
+            return new HuaweiEnvBuilder(ocl);
         }
         if (builderType.equals(BASIC_BUILDER)) {
             HuaweiImageBuilder imageBuilder = new HuaweiImageBuilder(ocl);
             HuaweiResourceBuilder resourceBuilder = new HuaweiResourceBuilder(ocl);
             resourceBuilder.addSubBuilder(imageBuilder);
-            return Optional.of(resourceBuilder);
+            return resourceBuilder;
         }
-        return Optional.empty();
+        throw new IllegalArgumentException("BuilderType:" + builderType + " not supported.");
     }
 }
