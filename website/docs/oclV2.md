@@ -9,7 +9,6 @@ The Open Services Cloud Configuration Language allows you to describe your servi
 
 The first part of OCL describes the metadata of the basic configuration of the service, the metadata of the resources required by the service
 
-* `resources` is , 
 ## resources
 `resources` used to describe the infrastructure of the service and the metadata of the resources required by the service
 (storage, computing, network, mirroring, etc.),`resources` is a list of `OclResource`,  each `OclResource` contains attributes such as `name`, `category`, `properties` etc.
