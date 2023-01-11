@@ -46,6 +46,14 @@
             <artifactId>orchestrator</artifactId>
             <version>${project.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.eclipse.osc.modules</groupId>
+            <artifactId>minio-storage</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+
         <dependency>
             <groupId>org.eclipse.osc.modules</groupId>
             <artifactId>api</artifactId>
