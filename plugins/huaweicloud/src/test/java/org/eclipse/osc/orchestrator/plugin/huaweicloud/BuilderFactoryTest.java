@@ -18,6 +18,16 @@ public class BuilderFactoryTest {
     }
 
     @Test
+    public void envBuilderTest() {
+        BuilderFactory builderFactory = new BuilderFactory();
+
+        Optional<AtomBuilder> builder = builderFactory.createBuilder(BuilderFactory.ENV_BUILDER,
+            new Ocl());
+
+        Assertions.assertTrue(builder.isPresent());
+    }
+
+    @Test
     public void unsupportedBuilderTest() {
         BuilderFactory builderFactory = new BuilderFactory();
 
