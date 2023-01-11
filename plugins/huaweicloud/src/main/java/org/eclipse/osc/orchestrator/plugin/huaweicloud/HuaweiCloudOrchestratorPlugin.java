@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.karaf.minho.boot.service.ConfigService;
 import org.apache.karaf.minho.boot.service.ServiceRegistry;
@@ -18,12 +17,9 @@ import org.eclipse.osc.orchestrator.OrchestratorStorage;
 public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin, Service {
 
     private final Map<String, Ocl> managedOcl = new HashMap<>();
-
-    private ConfigService config;
-
     OrchestratorStorage storage;
-
     ObjectMapper objectMapper = new ObjectMapper();
+    private ConfigService config;
 
     @Override
     public String name() {
@@ -76,16 +72,15 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin, Servic
             throw new IllegalStateException("Ocl object is null.");
         }
 
-        BuilderFactory factory = new BuilderFactory();
-        Optional<AtomBuilder> optionalAtomBuilder = factory.createBuilder(
-            BuilderFactory.BASIC_BUILDER, ocl);
-
         BuilderContext ctx = new BuilderContext();
         ctx.setConfig(config);
 
-        if (optionalAtomBuilder.isEmpty()) {
-            throw new IllegalStateException("Builder not found.");
-        }
+        BuilderFactory factory = new BuilderFactory();
+        AtomBuilder envBuilder = factory.createBuilder(
+            BuilderFactory.ENV_BUILDER, ocl);
+        AtomBuilder basicBuilder = factory.createBuilder(
+            BuilderFactory.BASIC_BUILDER, ocl);
+
         OclResources oclResources = getOclResources(managedServiceName);
         if (oclResources != null && oclResources.getState().equals("active")) {
             log.info("Managed service {} already in active.", managedServiceName);
@@ -96,9 +91,11 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin, Servic
         storeOclResources(managedServiceName, ctx.getOclResources());
 
         try {
-            optionalAtomBuilder.get().build(ctx);
+            envBuilder.build(ctx);
+            basicBuilder.build(ctx);
         } catch (Exception ex) {
-            optionalAtomBuilder.get().rollback(ctx);
+            envBuilder.build(ctx);
+            basicBuilder.rollback(ctx);
             throw ex;
         }
         ctx.getOclResources().setState("active");
@@ -111,15 +108,19 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin, Servic
         if (!managedOcl.containsKey(managedServiceName)) {
             throw new IllegalArgumentException("Service:" + managedServiceName + "not registered.");
         }
-        Optional<AtomBuilder> optionalAtomBuilder = createBuilder(managedServiceName);
 
+        Ocl ocl = managedOcl.get(managedServiceName).deepCopy();
+        if (ocl == null) {
+            throw new IllegalStateException("Ocl object is null.");
+        }
         BuilderContext ctx = new BuilderContext();
         ctx.setConfig(config);
 
-        if (optionalAtomBuilder.isEmpty()) {
-            throw new IllegalStateException("Builder not found.");
-        }
-        optionalAtomBuilder.get().rollback(ctx);
+        BuilderFactory factory = new BuilderFactory();
+        AtomBuilder envBuilder = factory.createBuilder(BuilderFactory.ENV_BUILDER, ocl);
+        AtomBuilder basicBuilder = factory.createBuilder(BuilderFactory.BASIC_BUILDER, ocl);
+        envBuilder.build(ctx);
+        basicBuilder.rollback(ctx);
 
         storeOclResources(managedServiceName, new OclResources());
     }
@@ -131,16 +132,6 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin, Servic
             throw new IllegalArgumentException("Service:" + managedServiceName + "not registered.");
         }
         managedOcl.remove(managedServiceName);
-    }
-
-    private Optional<AtomBuilder> createBuilder(String managedServiceName) {
-        Ocl ocl = managedOcl.get(managedServiceName).deepCopy();
-        if (ocl == null) {
-            throw new IllegalStateException("Ocl object is null.");
-        }
-
-        BuilderFactory factory = new BuilderFactory();
-        return factory.createBuilder(BuilderFactory.BASIC_BUILDER, ocl);
     }
 
     private void storeOclResources(String managedServiceName, OclResources oclResources) {
