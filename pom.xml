@@ -31,6 +31,7 @@
         <module>modules</module>
         <module>plugins</module>
         <module>runtime</module>
+        <module>osc-starter</module>
     </modules>
 
     <properties>
