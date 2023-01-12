@@ -1,0 +1,76 @@
+resources:
+  - category: vpc
+    name: vpc1
+    properties:
+      cidr: 192.168.0.0/16
+  - category: subnet
+    name: subnet-web
+    properties:
+      cidr: 192.168.10.0/24
+      gatewayIp: 192.168.10.1
+      vpc: vpc1
+  - category: security
+    name: osc-res-sg
+    properties:
+      rules:
+        - name: osc-res-sg-kafka
+          priority: 1
+          protocol: tcp
+          cidr: 10.10.2.6/32,
+          direction: inbound,
+          ports: 8080, 9092-9093, 2181
+          action: allow
+        - name: osc-res-sg-ssh-public
+          priority: 1
+          protocol: tcp
+          cidr: 121.36.59.153/32
+          direction: inbound
+          ports: 22, 8080, 9092-9093,2181
+          action: allow
+        - name: osc-res-sg-ssh-private
+          priority: 1,
+          protocol: tcp,
+          cidr: 198.19.0.0/16
+          direction: inbound
+          ports: 22
+          action: allow
+  - category: storage
+    name: osc-res-storage
+    properties:
+      type: SAS
+      size: 20GiB
+  - category: vm
+    name: kafka-vm
+    properties:
+      type: c7.large.4
+      subnet: subnet-web
+      provisioner: kafka
+      security: osc-res-sg
+      storage: osc-res-storage
+      publicly: true
+  - category: baseImage
+    name: Ubuntu 20.04 server 64bit
+    properties:
+      type: t2.large
+      filters:
+        name: ubuntu-for-osc-*
+  - category: baseImage
+    name: centos-x64
+    properties:
+      type: t2.large
+  - category: provisioner
+    name: my-kafka-release
+    properties:
+      baseImage: Ubuntu 20.04 server 64bit
+  - category: billing
+    name:
+    properties:
+      model: flat
+      period: monthly
+      currency: euro
+      fixedPrice: 20
+      variablePrice: 10
+      variableItem: instance
+
+
+
