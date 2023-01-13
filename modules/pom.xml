@@ -21,7 +21,7 @@
         <module>orchestrator</module>
         <module>api</module>
         <module>logging</module>
-      <module>minio-storage</module>
+        <module>file-storage</module>
     </modules>
 
 </project>
