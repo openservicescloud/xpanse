@@ -21,6 +21,7 @@
         <module>orchestrator</module>
         <module>api</module>
         <module>logging</module>
+      <module>file-storage</module>
     </modules>
 
 </project>

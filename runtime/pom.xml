@@ -56,6 +56,11 @@
             <artifactId>logging</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.eclipse.osc.modules</groupId>
+            <artifactId>file-storage</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
     <properties>
@@ -152,6 +157,31 @@
     </build>
 
     <profiles>
+        <profile>
+            <id>file-storage</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.eclipse.osc.modules</groupId>
+                    <artifactId>file-storage</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+            </dependencies>
+            <properties>
+                <image.name>osc/osc-file-storage</image.name>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>com.google.cloud.tools</groupId>
+                        <artifactId>jib-maven-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
         <profile>
             <id>huaweicloud</id>
             <dependencies>
