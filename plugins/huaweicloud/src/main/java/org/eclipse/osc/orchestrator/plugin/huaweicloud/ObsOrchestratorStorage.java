@@ -54,8 +54,14 @@ public class ObsOrchestratorStorage implements OrchestratorStorage, Service {
         if (location != null && location.length() != 0) {
             endpoint = "obs." + location + ".myhuaweicloud.com";
         }
-        obsClient = new ObsClient(accessKey, secretKey, endpoint);
-        obsBucket = createBucket(obsClient, location, enterpriseProjectId);
+        try {
+            log.info("Start to create OBS Client and OBS Bucket.");
+            obsClient = new ObsClient(accessKey, secretKey, endpoint);
+            obsBucket = createBucket(obsClient, location, enterpriseProjectId);
+        } catch (Exception e) {
+            log.error("Create OBS Client and OBS Bucket Error.",e);
+            throw new IllegalStateException("Create OBS Client and OBS Bucket Error.", e);
+        }
     }
 
     private ObsBucket createBucket(ObsClient obsClient, String location,
@@ -77,6 +83,11 @@ public class ObsOrchestratorStorage implements OrchestratorStorage, Service {
     }
 
     @Override
+    public int priority() {
+        return 900;
+    }
+
+    @Override
     public void store(String sid) {
         if (!exists(sid)) {
             try (ByteArrayInputStream input = new ByteArrayInputStream(sid.getBytes(
@@ -91,13 +102,11 @@ public class ObsOrchestratorStorage implements OrchestratorStorage, Service {
     @Override
     public void store(String sid, String pluginName, String key, String value) {
         String objectKey = getObjectKey(sid, pluginName, key);
-        if (!exists(objectKey)) {
-            try (ByteArrayInputStream input = new ByteArrayInputStream(value.getBytes(
-                StandardCharsets.UTF_8))) {
-                obsClient.putObject(obsBucket.getBucketName(), objectKey, input);
-            } catch (Exception e) {
-                throw new IllegalStateException("Can't store " + objectKey + " in Obs", e);
-            }
+        try (ByteArrayInputStream input = new ByteArrayInputStream(value.getBytes(
+            StandardCharsets.UTF_8))) {
+            obsClient.putObject(obsBucket.getBucketName(), objectKey, input);
+        } catch (Exception e) {
+            throw new IllegalStateException("Can't store " + objectKey + " in Obs", e);
         }
     }
 
