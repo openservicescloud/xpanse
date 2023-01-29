@@ -200,7 +200,8 @@ class Ocl2Hcl {
             hcl.append(String.format("\nresource \"huaweicloud_compute_instance\" \"%s\" {"
                     + "\n  name = \"%s\"",
                 vm.getName(), vm.getName()));
-
+            hcl.append("\n  availability_zone = data.huaweicloud_availability_zones.osc-az"
+                + ".names[0]");
             Optional<Artifact> artifact = ocl.referTo(vm.getImage(), Artifact.class);
             if (artifact.isPresent()) {
                 hcl.append("\n  image_id = \"").append(artifact.get().getId()).append("\"");
@@ -272,6 +273,15 @@ class Ocl2Hcl {
             hcl.append("\n  availability_zone = data.huaweicloud_availability_zones.osc-az"
                 + ".names[0]");
             hcl.append("\n}\n\n");
+            hcl.append(String.format(""
+                    + "\nresource \"huaweicloud_compute_volume_attach\" \"osc-attached-%s\" {\n"
+                    + "  volume_id   = huaweicloud_evs_volume.%s.id\n",
+                storage.getName(),storage.getName()));
+            for (var vm : ocl.getCompute().getVm()){
+                hcl.append(String.format("  instance_id = huaweicloud_compute_instance.%s.id\n"
+                    + "}", vm.getName()));
+            }
+
         }
 
         return hcl.toString();
