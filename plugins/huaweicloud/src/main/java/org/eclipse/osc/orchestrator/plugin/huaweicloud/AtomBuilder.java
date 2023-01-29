@@ -3,6 +3,10 @@ package org.eclipse.osc.orchestrator.plugin.huaweicloud;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import lombok.Getter;
 import lombok.Setter;
@@ -97,8 +101,19 @@ public abstract class AtomBuilder {
      */
     public boolean build(BuilderContext ctx) {
         setState(BuilderState.RUNNING);
+        try {
+            Future<Boolean> future = new ThreadPoolExecutor(10, 20,
+                300, TimeUnit.SECONDS, new LinkedBlockingDeque<>(10))
+                .submit(() -> asynMultiThreadBuild(ctx, subBuilders));
+            return future.get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
+        return true;
+    }
 
-        for (AtomBuilder subBuilder : subBuilders) {
+    private boolean asynMultiThreadBuild(BuilderContext ctx, List<AtomBuilder> atomBuilderList) {
+        for (AtomBuilder subBuilder : atomBuilderList) {
             if (!subBuilder.build(ctx)) {
                 setState(BuilderState.FAILED);
                 log.error("Submit builder: {} failed.", subBuilder.name());
