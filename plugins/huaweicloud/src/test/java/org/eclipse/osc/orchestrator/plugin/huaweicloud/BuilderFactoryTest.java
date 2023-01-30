@@ -21,6 +21,14 @@ public class BuilderFactoryTest {
         Assertions.assertEquals("Huawei-Cloud-env-Builder", builder.name());
     }
 
+
+    @Test
+    public void basicBuilderDeprecatedTest() {
+        BuilderFactory builderFactory = new BuilderFactory();
+        AtomBuilder builder = builderFactory.createBuilder(BuilderFactory.BASIC_BUILDER_DEPRECATED, new Ocl());
+        Assertions.assertTrue(Objects.nonNull(builder));
+    }
+
     @Test
     public void unsupportedBuilderTest() {
         BuilderFactory builderFactory = new BuilderFactory();
