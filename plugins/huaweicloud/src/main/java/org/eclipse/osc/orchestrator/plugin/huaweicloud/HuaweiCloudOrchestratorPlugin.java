@@ -49,6 +49,12 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin, Servic
             throw new IllegalArgumentException("registering invalid ocl. ocl = null");
         }
         managedOcl.put(ocl.getName(), ocl);
+        OclResources oclResources = getOclResources(ocl.getName());
+        if (oclResources.getState().equals("success")) {
+            log.info("Managed service {} already in active.", ocl.getName());
+        }
+        oclResources.setState("registered");
+        storeOclResources(ocl.getName(), oclResources);
     }
 
     @Override
@@ -71,35 +77,26 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin, Servic
         if (ocl == null) {
             throw new IllegalStateException("Ocl object is null.");
         }
-
+        OclResources oclResources = getOclResources(managedServiceName);
+        if (oclResources != null && oclResources.getState().equals("success")) {
+            log.info("Managed service {} already in active.", managedServiceName);
+            return;
+        }
         BuilderContext ctx = new BuilderContext();
         ctx.setConfig(config);
+        ctx.setServiceName(managedServiceName);
+        ctx.setPluginName(name());
 
         BuilderFactory factory = new BuilderFactory();
         AtomBuilder envBuilder = factory.createBuilder(
             BuilderFactory.ENV_BUILDER, ocl);
+        ctx.getBuilderMap().put(BuilderFactory.ENV_BUILDER, envBuilder);
         AtomBuilder basicBuilder = factory.createBuilder(
             BuilderFactory.BASIC_BUILDER, ocl);
-
-        OclResources oclResources = getOclResources(managedServiceName);
-        if (oclResources != null && oclResources.getState().equals("active")) {
-            log.info("Managed service {} already in active.", managedServiceName);
-            return;
-        }
-
-        ctx.getOclResources().setState("building");
-        storeOclResources(managedServiceName, ctx.getOclResources());
-
-        try {
-            envBuilder.build(ctx);
-            basicBuilder.build(ctx);
-        } catch (Exception ex) {
-            envBuilder.build(ctx);
-            basicBuilder.rollback(ctx);
-            throw ex;
-        }
-        ctx.getOclResources().setState("active");
-        storeOclResources(managedServiceName, ctx.getOclResources());
+        ctx.getBuilderMap().put(BuilderFactory.BASIC_BUILDER, basicBuilder);
+        ctx.setStorage(storage);
+        envBuilder.build(ctx);
+        basicBuilder.build(ctx);
     }
 
     @Override
@@ -119,9 +116,9 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin, Servic
         BuilderFactory factory = new BuilderFactory();
         AtomBuilder envBuilder = factory.createBuilder(BuilderFactory.ENV_BUILDER, ocl);
         AtomBuilder basicBuilder = factory.createBuilder(BuilderFactory.BASIC_BUILDER, ocl);
-        envBuilder.build(ctx);
+        envBuilder.rollback(ctx);
         basicBuilder.rollback(ctx);
-
+        ctx.getOclResources().setState("stopped");
         storeOclResources(managedServiceName, new OclResources());
     }
 
@@ -153,19 +150,17 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin, Servic
     private OclResources getOclResources(String managedServiceName) {
         OclResources oclResources;
         String oclResourceStr;
-        if (storage != null) {
-            oclResourceStr = storage.getKey(managedServiceName, name(), "state");
-        } else {
-            return null;
-        }
-
         try {
-            oclResources = objectMapper.readValue(oclResourceStr, OclResources.class);
+            if (storage != null) {
+                oclResourceStr = storage.getKey(managedServiceName, name(), "state");
+                oclResources = objectMapper.readValue(oclResourceStr, OclResources.class);
+            } else {
+                oclResources = new OclResources();
+            }
         } catch (JsonProcessingException ex) {
             log.error("Serial OCL object to json failed.", ex);
             oclResources = new OclResources();
         }
-
         return oclResources;
     }
 }
