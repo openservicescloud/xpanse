@@ -1,0 +1,84 @@
+provider: huaweicloud
+serviceName: ubutun-esc-demo-bxs
+resources:
+  - kind: vpc
+    id: 02ba0f17-ec67-4dbe-8738-133fecc9f395
+    name: vpc1-bxs
+    properties:
+      cidr: 192.168.0.0/16
+  - kind: subnet
+    id: 6a7c406d-5bc6-4b50-8f75-948aea69cb24
+    name: subnet-web-bxs
+    properties:
+      cidr: 192.168.10.0/24
+      gatewayIp: 192.168.10.1
+      vpc: vpc1-bxs
+  - kind: security
+    id: e2d4de73-1518-40f7-8de1-60f184ea6e1d
+    name: osc-res-sg-bxs
+    properties:
+      rules:
+        - name: osc-res-bxs
+          priority: 1
+          protocol: tcp
+          cidr: 10.10.2.6/32
+          direction: inbound
+          ports: 8080,9092-9093,2181
+          action: allow
+        - name: osc-res-sg-ssh-public
+          priority: 1
+          protocol: tcp
+          cidr: 121.36.59.153/32
+          direction: inbound
+          ports: 22,8080,9092-9093,2181
+          action: allow
+        - name: osc-res-sg-ssh-private
+          priority: 1
+          protocol: tcp
+          cidr: 198.19.0.0/16
+          direction: inbound
+          ports: 22
+          action: allow
+  - kind: storage
+    name: osc-res-storage
+    properties:
+      type: SAS
+      size: 20GiB
+  - kind: storage
+    name: osc-res-system
+    properties:
+      type: SAS
+      size: 20GiB
+  - kind: compute
+    id:
+    name: ubutun-ecs-demo
+    properties:
+      type: c7.large.4
+      subnet: subnet-web-bxs
+      image: ubutun-x64
+      security: osc-res-sg-bxs
+      storage: osc-res-storage
+      publicly: true
+  - kind: image
+    id: 65d210de-e73d-4e9f-9801-42469f92994d
+    name: ubutun-x64
+    properties:
+      type: t2.large
+  - kind: image
+    name: centos-x64
+    id: 5556833f-d23c-4594-8714-a83e2cedd7b3
+    properties:
+      type: t2.large
+  - kind: billing
+    id:
+    name: billing
+    properties:
+      model: flat
+      period: monthly
+      currency: euro
+      fixedPrice: 20
+      variablePrice: 10
+      variableItem: instance
+
+
+
