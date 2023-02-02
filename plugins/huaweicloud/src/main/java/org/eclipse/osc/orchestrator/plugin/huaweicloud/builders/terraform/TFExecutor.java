@@ -118,4 +118,16 @@ public class TFExecutor {
             throw new TFExecutorException("Read state file failed.", ex);
         }
     }
+
+    public void restoreTFState(String tfStateStr) {
+        try {
+            String verPath =
+                workPath + FileSystems.getDefault().getSeparator() + "terraform.tfstate";
+            try (FileWriter tfStateFile = new FileWriter(verPath, false)) {
+                tfStateFile.write(tfStateStr);
+            }
+        } catch (IOException ex) {
+            throw new TFExecutorException("TFExecutor restoreTFState failed.", ex);
+        }
+    }
 }
