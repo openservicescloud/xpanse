@@ -11,8 +11,9 @@ resources:
     name: subnet-web-bxs
     properties:
       cidr: 192.168.10.0/24
-      gatewayIp: 192.168.10.1
+      gateway_ip: 192.168.10.1
       vpc: vpc1-bxs
+      dns_list: [ "100.125.1.250", "100.125.129.250" ]
   - kind: security
     id: e2d4de73-1518-40f7-8de1-60f184ea6e1d
     name: osc-res-sg-bxs
@@ -40,12 +41,8 @@ resources:
           ports: 22
           action: allow
   - kind: storage
-    name: osc-res-storage
-    properties:
-      type: SAS
-      size: 20GiB
-  - kind: storage
     name: osc-res-system
+    id: ae61b39c-52ea-401a-9743-b7164f31944b
     properties:
       type: SAS
       size: 20GiB
@@ -63,12 +60,14 @@ resources:
     id: 65d210de-e73d-4e9f-9801-42469f92994d
     name: ubutun-x64
     properties:
+      name: Ubuntu 20.04 server 64bit
       type: t2.large
   - kind: image
     name: centos-x64
-    id: 5556833f-d23c-4594-8714-a83e2cedd7b3
+    id: bb7bb1da-a442-46d1-92fb-8fcdf670ab02
     properties:
       type: t2.large
+      name: CentOS 7.9 64bit
   - kind: billing
     id:
     name: billing

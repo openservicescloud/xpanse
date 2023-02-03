@@ -234,8 +234,14 @@ class OclV2ToHcl {
                         hcl.append("\n  image_id = \"").append(compute.getImage().getId())
                             .append("\"");
                     } else if (StringUtils.isNotBlank(compute.getImage().getName())) {
-                        hcl.append("\n  image_name = \"").append(compute.getImage().getName())
+                        String imageName = compute.getImage().getName();
+                        if (StringUtils.isNotBlank(
+                            compute.getImage().getProperties().get("name").toString())) {
+                            imageName = compute.getImage().getProperties().get("name").toString();
+                        }
+                        hcl.append("\n  image_name = \"").append(imageName)
                             .append("\"");
+
                     } else {
                         hcl.append("\n  image_id = image not found\"");
                     }
@@ -315,24 +321,35 @@ class OclV2ToHcl {
 
         StringBuilder hcl = new StringBuilder();
         for (var storage : ocl.getStorages()) {
-            // The provider huaweicloud/huaweicloud does not support data source
-            // "huaweicloud_evs_volume"
-            hcl.append(String.format("\nresource \"huaweicloud_evs_volume\" \"%s\" {"
-                    + "\n  name = \"%s\""
-                    + "\n  volume_type = \"%s\""
-                    + "\n  size = \"%s\"",
-                storage.getName(), storage.getName(), storage.getType(),
-                storage.getSize().replaceAll("[^0-9]*GiB", "").strip()));
-            // TODO: Add variable [var.availability_zone] for availability_zone
-            hcl.append("\n  availability_zone = data.huaweicloud_availability_zones.osc-az"
-                + ".names[0]");
-            hcl.append("\n}\n\n");
-            hcl.append(String.format(""
-                    + "\nresource \"huaweicloud_compute_volume_attach\" \"osc-attached-%s\" {\n"
-                    + "  volume_id   = huaweicloud_evs_volume.%s.id\n",
-                storage.getName(), storage.getName()));
+            if (storage.isExistedResource()) {
+                log.info(
+                    "The provider huaweicloud/huaweicloud does not support data source "
+                        + "\"huaweicloud_evs_volume\"");
+            } else {
+                hcl.append(String.format("\nresource \"huaweicloud_evs_volume\" \"%s\" {"
+                        + "\n  name = \"%s\""
+                        + "\n  volume_type = \"%s\""
+                        + "\n  size = \"%s\"",
+                    storage.getName(), storage.getName(), storage.getType(),
+                    storage.getSize().replaceAll("[^0-9]*GiB", "").strip()));
+                // TODO: Add variable [var.availability_zone] for availability_zone
+                hcl.append("\n  availability_zone = data.huaweicloud_availability_zones.osc-az"
+                    + ".names[0]");
+                hcl.append("\n}\n\n");
+            }
+            if (storage.isExistedResource()) {
+                hcl.append(String.format(""
+                        + "\nresource \"huaweicloud_compute_volume_attach\" \"osc-attached-%s\" {\n"
+                        + "  volume_id   = \"%s\"",
+                    storage.getName(), storage.getId()));
+            } else {
+                hcl.append(String.format(""
+                        + "\nresource \"huaweicloud_compute_volume_attach\" \"osc-attached-%s\" {\n"
+                        + "  volume_id   = huaweicloud_evs_volume.%s.id",
+                    storage.getName(), storage.getName()));
+            }
             for (var compute : ocl.getComputes()) {
-                hcl.append(String.format("  instance_id = huaweicloud_compute_instance.%s.id\n"
+                hcl.append(String.format("\n  instance_id = huaweicloud_compute_instance.%s.id\n"
                     + "}", compute.getName()));
             }
         }
