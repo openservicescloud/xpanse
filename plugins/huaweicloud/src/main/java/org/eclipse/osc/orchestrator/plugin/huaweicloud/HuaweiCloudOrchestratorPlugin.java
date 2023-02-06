@@ -74,6 +74,7 @@ public class HuaweiCloudOrchestratorPlugin implements OrchestratorPlugin, Servic
 
         BuilderContext ctx = new BuilderContext();
         ctx.setConfig(config);
+        ctx.setStorage(storage);
 
         BuilderFactory factory = new BuilderFactory();
         AtomBuilder envBuilder = factory.createBuilder(
