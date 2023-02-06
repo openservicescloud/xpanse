@@ -1,80 +1,77 @@
+provider: huaweicloud
+serviceName: ubutun-esc-demo
 resources:
   - kind: vpc
-    name: vpc1
+    id:
+    name: vpc1-wl
     properties:
-      id:
       cidr: 192.168.0.0/16
   - kind: subnet
-    name: subnet-web
+    id:
+    name: subnet-web-wl
     properties:
-      id:
       cidr: 192.168.10.0/24
       gatewayIp: 192.168.10.1
-      vpc: vpc1
+      vpc: vpc1-wl
   - kind: security
-    name: osc-res-sg
+    id:
+    name: osc-res-sg-wl
     properties:
-      id:
       rules:
         - name: osc-res-sg-kafka
           priority: 1
           protocol: tcp
-          cidr: 10.10.2.6/32,
-          direction: inbound,
-          ports: 8080, 9092-9093, 2181
+          cidr: 10.10.2.6/32
+          direction: inbound
+          ports: 8080,9092-9093,2181
           action: allow
         - name: osc-res-sg-ssh-public
           priority: 1
           protocol: tcp
           cidr: 121.36.59.153/32
           direction: inbound
-          ports: 22, 8080, 9092-9093,2181
+          ports: 22,8080,9092-9093,2181
           action: allow
         - name: osc-res-sg-ssh-private
-          priority: 1,
-          protocol: tcp,
+          priority: 1
+          protocol: tcp
           cidr: 198.19.0.0/16
           direction: inbound
           ports: 22
           action: allow
   - kind: storage
-    name: osc-res-storage
+    name: osc-res-storage-wl
+    id:
     properties:
-      id:
       type: SAS
       size: 20GiB
   - kind: vm
-    name: kafka-vm
+    name: ubutun-ecs-demo-wl
+    id:
     properties:
-      id:
       type: c7.large.4
-      subnet: subnet-web
-      provisioner: kafka
-      security: osc-res-sg
-      storage: osc-res-storage
+      subnet: subnet-web-wl
+      image: Ubuntu 20.04 server 64bit
+      security: osc-res-sg-wl
+      storage: osc-res-storage-wl
       publicly: true
   - kind: image
+    id:
     name: Ubuntu 20.04 server 64bit
     properties:
-      id:
       type: t2.large
-      filters:
-        name: ubuntu-for-osc-*
   - kind: image
     name: centos-x64
+    id:
     properties:
-      id:
       type: t2.large
   - kind: billing
-    name:
+    id:
+    name: billing
     properties:
-      id:
       model: flat
       period: monthly
       currency: euro
       fixedPrice: 20
       variablePrice: 10
       variableItem: instance
-
-
-
