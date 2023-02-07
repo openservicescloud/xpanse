@@ -66,17 +66,4 @@ public class OclResourcesLoader {
         }
         return new HashSet<>();
     }
-
-    public static void main(String[] args) {
-        OclResourcesV2 oclResources = parseYamlToResources("D:\\project\\Osc\\osc\\modules\\ocl-loader\\src\\main\\resources\\resources.yaml");
-        String hclByOclResources = OclResources2Hcl.getOclResourcesHcl(oclResources);
-        String tfPath = "resources1.tf";
-        try {
-            try (FileWriter tfFile = new FileWriter(tfPath)) {
-                tfFile.write(hclByOclResources);
-            }
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-    }
 }
