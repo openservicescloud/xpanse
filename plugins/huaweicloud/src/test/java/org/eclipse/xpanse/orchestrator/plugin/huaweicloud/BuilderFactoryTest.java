@@ -18,7 +18,7 @@ public class BuilderFactoryTest {
         BuilderFactory builderFactory = new BuilderFactory();
 
         Optional<AtomBuilder> builder = builderFactory.createBuilder(BuilderFactory.BASIC_BUILDER,
-                new Ocl());
+            new Ocl());
 
         Assertions.assertTrue(builder.isPresent());
     }
@@ -30,5 +30,25 @@ public class BuilderFactoryTest {
         Optional<AtomBuilder> builder = builderFactory.createBuilder("invalid", new Ocl());
 
         Assertions.assertTrue(builder.isEmpty());
+    }
+
+    @Test
+    public void basicBuilderDeprecatedTest() {
+        BuilderFactory builderFactory = new BuilderFactory();
+
+        Optional<AtomBuilder> builder =
+            builderFactory.createBuilder(BuilderFactory.BASIC_BUILDER_DEPRECATED, new Ocl());
+
+        Assertions.assertTrue(builder.isPresent());
+    }
+
+    @Test
+    public void envBuilderTest() {
+        BuilderFactory builderFactory = new BuilderFactory();
+
+        Optional<AtomBuilder> builder =
+            builderFactory.createBuilder(BuilderFactory.ENV_BUILDER, new Ocl());
+
+        Assertions.assertTrue(builder.isPresent());
     }
 }
