@@ -5,6 +5,7 @@ import java.util.Map;
 import lombok.Data;
 import org.apache.karaf.minho.boot.service.ConfigService;
 import org.eclipse.osc.modules.ocl.loader.OclResources;
+import org.eclipse.osc.orchestrator.OrchestratorStorage;
 
 @Data
 public class BuilderContext extends HashMap<String, Map<String, String>> {
@@ -12,4 +13,6 @@ public class BuilderContext extends HashMap<String, Map<String, String>> {
     private ConfigService config;
 
     private OclResources oclResources = new OclResources();
+
+    private OrchestratorStorage storage;
 }

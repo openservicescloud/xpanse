@@ -11,11 +11,16 @@ public class BuilderFactory {
 
     public static final String BASIC_BUILDER = "basic";
 
+    public static final String BASIC_BUILDER_DEPRECATED = "basic_deprecated";
+
     public AtomBuilder createBuilder(String builderType, Ocl ocl) {
         if (builderType.equals(ENV_BUILDER)) {
             return new HuaweiEnvBuilder(ocl);
         }
         if (builderType.equals(BASIC_BUILDER)) {
+            return new HuaweiResourceBuilder(ocl);
+        }
+        if (builderType.equals(BASIC_BUILDER_DEPRECATED)) {
             HuaweiImageBuilder imageBuilder = new HuaweiImageBuilder(ocl);
             HuaweiResourceBuilder resourceBuilder = new HuaweiResourceBuilder(ocl);
             resourceBuilder.addSubBuilder(imageBuilder);
