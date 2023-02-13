@@ -9,7 +9,7 @@ package org.eclipse.xpanse.orchestrator.plugin.huaweicloud.builders.terraform;
 import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.eclipse.xpanse.modules.ocl.loader.data.models.OclResource;
+import org.eclipse.xpanse.modules.ocl.state.OclResource;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -27,8 +27,7 @@ class TfResourceEipAssociate extends TfResourceSchema {
     }
 
     public boolean isMatch(OclResource oclResource, TfStateResource tfStateResource) {
-        return oclResource.getType().equals("compute")
-                &&
-                ("osc-eip-associated-" + oclResource.getName()).equals(tfStateResource.getName());
+        return oclResource.getType().equals("compute") && ("xpanse-eip-associated-"
+                + oclResource.getName()).equals(tfStateResource.getName());
     }
 }

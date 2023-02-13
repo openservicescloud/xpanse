@@ -8,7 +8,6 @@ package org.eclipse.xpanse.orchestrator.plugin.huaweicloud.builders;
 
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.xpanse.modules.ocl.loader.data.models.Artifact;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.Ocl;
 import org.eclipse.xpanse.orchestrator.plugin.huaweicloud.AtomBuilder;
 import org.eclipse.xpanse.orchestrator.plugin.huaweicloud.BuilderContext;
@@ -37,22 +36,10 @@ public class HuaweiResourceBuilder extends AtomBuilder {
             log.error("BuilderContext is invalid.");
             throw new BuilderException(this, "Builder context is null.");
         }
-        Map<String, String> imageCtx = ctx.get(new HuaweiImageBuilder(ocl).name());
         Map<String, String> envCtx = ctx.get(new HuaweiEnvBuilder(ocl).name());
         if (envCtx == null) {
             log.error("Dependent builder: {} must build first.", new HuaweiEnvBuilder(ocl).name());
             throw new BuilderException(this, "HuaweiEnvBuilder context is null.");
-        }
-        if (imageCtx == null) {
-            log.error("Dependent builder: {} must build first.",
-                    new HuaweiImageBuilder(ocl).name());
-            throw new BuilderException(this, "HuaweiImageBuilder context is null.");
-        }
-
-        for (Artifact artifact : ocl.getImage().getArtifacts()) {
-            if (imageCtx.containsKey(artifact.getName())) {
-                artifact.setId(imageCtx.get(artifact.getName()));
-            }
         }
 
         OclTerraformExecutor tfExecutor = new OclTerraformExecutor(ocl, envCtx);
