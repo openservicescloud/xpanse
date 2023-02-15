@@ -16,10 +16,7 @@ public class BuilderFactory {
             return new HuaweiEnvBuilder(ocl);
         }
         if (builderType.equals(BASIC_BUILDER)) {
-            HuaweiImageBuilder imageBuilder = new HuaweiImageBuilder(ocl);
-            HuaweiResourceBuilder resourceBuilder = new HuaweiResourceBuilder(ocl);
-            resourceBuilder.addSubBuilder(imageBuilder);
-            return resourceBuilder;
+            return new HuaweiResourceBuilder(ocl);
         }
         throw new IllegalArgumentException("BuilderType:" + builderType + " not supported.");
     }

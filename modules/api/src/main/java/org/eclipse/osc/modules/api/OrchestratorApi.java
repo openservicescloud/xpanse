@@ -9,6 +9,7 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.karaf.minho.boot.Minho;
 import org.eclipse.osc.modules.ocl.loader.Ocl;
@@ -37,9 +38,8 @@ public class OrchestratorApi {
     @Path("/health")
     @GET
     @Produces(MediaType.TEXT_PLAIN)
-    public String health() {
-        OrchestratorService orchestratorService = getOrchestrator();
-        return "ready";
+    public Response health() {
+        return Response.ok("ready").build();
     }
 
     @Path("/services/state/{managedServiceName}")
@@ -67,7 +67,7 @@ public class OrchestratorApi {
     public Response start(@HeaderParam("managedServiceName") String managedServiceName)
         throws Exception {
         getOrchestrator().startManagedService(managedServiceName);
-        return Response.ok().build();
+        return Response.ok("Service " + managedServiceName+ " start building.").build();
     }
 
     @Path("/stop")

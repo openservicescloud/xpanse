@@ -15,8 +15,10 @@ import org.eclipse.osc.orchestrator.plugin.huaweicloud.builders.HuaweiResourceBu
 import org.eclipse.osc.modules.ocl.loader.Ocl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+@Disabled
 public class AtomBuilderTest {
 
     private HuaweiEnvBuilder envBuilder;

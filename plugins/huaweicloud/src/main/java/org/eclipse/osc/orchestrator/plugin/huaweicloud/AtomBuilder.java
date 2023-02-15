@@ -5,9 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,12 +16,8 @@ import org.eclipse.osc.orchestrator.plugin.huaweicloud.enums.BuilderState;
 @Slf4j
 public abstract class AtomBuilder {
 
-    private static final int CPU_COUNT = Runtime.getRuntime().availableProcessors();
     private static final long WAIT_AND_CHECK_TIME = 5;
     private static final long BUILDING_TIMEOUT_DEFAULT = 100;
-    public static ExecutorService executorService = new ThreadPoolExecutor(CPU_COUNT + 1,
-        CPU_COUNT * 10,
-        300, TimeUnit.SECONDS, new LinkedBlockingDeque<>(100));
     protected final Ocl ocl;
     private final List<AtomBuilder> subBuilders = new ArrayList<>();
     ObjectMapper objectMapper = new ObjectMapper();
@@ -105,23 +98,12 @@ public abstract class AtomBuilder {
      * @return The building result, true or false. More detailed state will be present by @state.
      */
     public boolean build(BuilderContext ctx) {
+        boolean succeed = true;
         setState(BuilderState.RUNNING);
         ctx.getOclResources().setState("building");
         storeOclResources(ctx);
-        executorService.execute(
-            () -> {
-                Thread.currentThread().setName("BuildThread_" + this.name() + "_"
-                    + System.currentTimeMillis());
-                asynchronousBuild(ctx, subBuilders);
-            });
-        return true;
-    }
-
-
-    public void asynchronousBuild(BuilderContext ctx, List<AtomBuilder> subBuilderList) {
-        boolean succeed = true;
         try {
-            for (AtomBuilder subBuilder : subBuilderList) {
+            for (AtomBuilder subBuilder : subBuilders) {
                 if (!subBuilder.build(ctx)) {
                     succeed = false;
                     setState(BuilderState.FAILED);
@@ -132,7 +114,7 @@ public abstract class AtomBuilder {
             if (!waitSubBuilders()) {
                 log.error("Wait sub builders failed.");
             }
-            if (subBuilderList.stream()
+            if (subBuilders.stream()
                 .anyMatch(builder -> builder.getState() == BuilderState.FAILED)) {
                 succeed = false;
                 // Todo: give out the specified failed reason with setLastFail().
@@ -157,6 +139,7 @@ public abstract class AtomBuilder {
             ctx.getOclResources().setState("failed");
             storeOclResources(ctx);
         }
+        return succeed;
     }
 
     /**
