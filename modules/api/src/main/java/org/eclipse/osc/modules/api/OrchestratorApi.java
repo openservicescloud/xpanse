@@ -9,10 +9,11 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.karaf.minho.boot.Minho;
-import org.eclipse.osc.orchestrator.OrchestratorService;
 import org.eclipse.osc.modules.ocl.loader.Ocl;
+import org.eclipse.osc.orchestrator.OrchestratorService;
 
 @Slf4j
 @Path("/")
@@ -23,7 +24,7 @@ public class OrchestratorApi {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response register(Ocl ocl) throws Exception {
         getOrchestrator().registerManagedService(ocl);
-        return Response.ok().build();
+        return Response.ok("Service " + ocl.getName() + " register succeed.").build();
     }
 
     @Path("/register/fetch")
@@ -37,11 +38,8 @@ public class OrchestratorApi {
     @Path("/health")
     @GET
     @Produces(MediaType.TEXT_PLAIN)
-    public String health() throws Exception {
-        if (getOrchestrator() == null) {
-            throw new IllegalStateException("Orchestrator service is not ready");
-        }
-        return "ready";
+    public Response health() {
+        return Response.ok("ready").build();
     }
 
     @Path("/services/state/{managedServiceName}")
@@ -56,25 +54,27 @@ public class OrchestratorApi {
     @Path("/services")
     @GET
     @Produces(MediaType.TEXT_PLAIN)
-    public String services() throws Exception {
+    public String services() {
         StringBuilder builder = new StringBuilder();
-        getOrchestrator().getStorage().services().stream().forEach(service -> {
-            builder.append(service).append("\n");
-        });
+        getOrchestrator().getStorage().services().forEach(service ->
+            builder.append(service).append("\n")
+        );
         return builder.toString();
     }
 
     @Path("/start")
     @POST
-    public Response start(@HeaderParam("managedServiceName") String managedServiceName) throws Exception {
+    public Response start(@HeaderParam("managedServiceName") String managedServiceName)
+        throws Exception {
         getOrchestrator().startManagedService(managedServiceName);
-        return Response.ok().build();
+        return Response.ok("Service " + managedServiceName+ " start building.").build();
     }
 
     @Path("/stop")
     @POST
     @Consumes(MediaType.TEXT_PLAIN)
-    public Response stop(@HeaderParam("managedServiceName") String managedServiceName) throws Exception {
+    public Response stop(@HeaderParam("managedServiceName") String managedServiceName)
+        throws Exception {
         getOrchestrator().stopManagedService(managedServiceName);
         return Response.ok().build();
     }
@@ -82,7 +82,8 @@ public class OrchestratorApi {
     @Path("/update")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response update(@HeaderParam("managedServiceName") String managedServiceName, Ocl ocl) throws Exception {
+    public Response update(@HeaderParam("managedServiceName") String managedServiceName, Ocl ocl)
+        throws Exception {
         getOrchestrator().updateManagedService(managedServiceName, ocl);
         return Response.ok().build();
     }
@@ -90,14 +91,16 @@ public class OrchestratorApi {
     @Path("/update/fetch")
     @POST
     @Consumes(MediaType.TEXT_PLAIN)
-    public Response update(@HeaderParam("managedServiceName") String managedServiceName, @HeaderParam("ocl") String oclLocation) throws Exception {
+    public Response update(@HeaderParam("managedServiceName") String managedServiceName,
+        @HeaderParam("ocl") String oclLocation) throws Exception {
         getOrchestrator().updateManagedService(managedServiceName, oclLocation);
         return Response.ok().build();
     }
 
-    private OrchestratorService getOrchestrator() throws Exception {
+    private OrchestratorService getOrchestrator() {
         Minho minho = Minho.getInstance();
-        OrchestratorService orchestratorService = minho.getServiceRegistry().get(OrchestratorService.class);
+        OrchestratorService orchestratorService = minho.getServiceRegistry()
+            .get(OrchestratorService.class);
 
         if (orchestratorService == null) {
             throw new IllegalStateException("Orchestrator service is not available");

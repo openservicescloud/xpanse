@@ -36,15 +36,7 @@ public class HuaweiResourceBuilder extends AtomBuilder {
             log.error("Dependent builder: {} must build first.", new HuaweiEnvBuilder(ocl).name());
             throw new BuilderException(this, "HuaweiEnvBuilder context is null.");
         }
-        if (imageCtx == null) {
-            log.error("Dependent builder: {} must build first.",
-                new HuaweiImageBuilder(ocl).name());
-            throw new BuilderException(this, "HuaweiImageBuilder context is null.");
-        }
-        if (storage == null) {
-            log.error("OrchestratorStorage is null.");
-            throw new BuilderException(this, "OrchestratorStorage is null.");
-        }
+
 
         for (Artifact artifact : ocl.getImage().getArtifacts()) {
             if (imageCtx.containsKey(artifact.getName())) {
