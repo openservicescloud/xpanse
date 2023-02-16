@@ -2,6 +2,7 @@ package org.eclipse.osc.orchestrator.plugin.huaweicloud.builders;
 
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.osc.orchestrator.OrchestratorStorage;
 import org.eclipse.osc.orchestrator.plugin.huaweicloud.AtomBuilder;
 import org.eclipse.osc.orchestrator.plugin.huaweicloud.BuilderContext;
 import org.eclipse.osc.orchestrator.plugin.huaweicloud.builders.terraform.OclTFExecutor;
@@ -30,15 +31,12 @@ public class HuaweiResourceBuilder extends AtomBuilder {
         }
         Map<String, String> imageCtx = ctx.get(new HuaweiImageBuilder(ocl).name());
         Map<String, String> envCtx = ctx.get(new HuaweiEnvBuilder(ocl).name());
+        OrchestratorStorage storage = ctx.getStorage();
         if (envCtx == null) {
             log.error("Dependent builder: {} must build first.", new HuaweiEnvBuilder(ocl).name());
             throw new BuilderException(this, "HuaweiEnvBuilder context is null.");
         }
-//        if (imageCtx == null) {
-//            log.error("Dependent builder: {} must build first.",
-//                new HuaweiImageBuilder(ocl).name());
-//            throw new BuilderException(this, "HuaweiImageBuilder context is null.");
-//        }
+
 
         for (Artifact artifact : ocl.getImage().getArtifacts()) {
             if (imageCtx.containsKey(artifact.getName())) {
@@ -57,12 +55,21 @@ public class HuaweiResourceBuilder extends AtomBuilder {
         if (!tfExecutor.tfPlan()) {
             throw new BuilderException(this, "TFExecutor.tfPlan failed." + name());
         }
+
+        String tfStateStr = tfExecutor.getTFState();
+        if (tfStateStr != null && tfStateStr.length() != 0) {
+            String tfStateStrTemp = storage.getKey(ocl.getName(), "tfState", "file");
+            if (tfStateStrTemp != null && tfStateStrTemp.length() != 0) {
+                tfExecutor.restoreTFState(tfStateStrTemp);
+            }
+        }
+
         if (!tfExecutor.tfApply()) {
             throw new BuilderException(this, "TFExecutor.tfApply failed." + name());
         }
 
         tfExecutor.updateOclResources(ctx.getOclResources());
-
+        storage.store(ocl.getName(), "tfState", "file", tfExecutor.getTFState());
         return true;
     }
 

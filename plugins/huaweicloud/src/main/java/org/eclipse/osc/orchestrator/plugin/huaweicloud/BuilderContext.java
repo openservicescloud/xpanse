@@ -20,7 +20,7 @@ public class BuilderContext extends HashMap<String, Map<String, String>> {
 
     private OclResources oclResources = new OclResources();
 
-    private Map<String, AtomBuilder> builderMap = new HashMap<>();
 
+    private Map<String, AtomBuilder> builderMap = new HashMap<>();
     private OrchestratorStorage storage;
 }

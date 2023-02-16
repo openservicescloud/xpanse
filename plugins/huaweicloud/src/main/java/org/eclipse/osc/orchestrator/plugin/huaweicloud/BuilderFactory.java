@@ -11,6 +11,8 @@ public class BuilderFactory {
 
     public static final String BASIC_BUILDER = "basic";
 
+    public static final String BASIC_BUILDER_DEPRECATED = "basic_deprecated";
+
     public AtomBuilder createBuilder(String builderType, Ocl ocl) {
         if (builderType.equals(ENV_BUILDER)) {
             return new HuaweiEnvBuilder(ocl);
