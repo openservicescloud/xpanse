@@ -1,0 +1,28 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: Huawei Inc.
+ *
+ */
+
+package org.eclipse.xpanse.modules.engine.exceptions;
+
+
+import org.eclipse.xpanse.modules.engine.AtomBuilder;
+
+/**
+ * Defines exceptions returned by the builder.
+ */
+public class BuilderException extends RuntimeException {
+
+    public BuilderException(AtomBuilder builder) {
+        super("Builder Exception: [" + builder.name() + "] ");
+    }
+
+    public BuilderException(AtomBuilder builder, String message) {
+        super("Builder Exception: [" + builder.name() + "] " + message);
+    }
+
+    public BuilderException(AtomBuilder builder, String message, Throwable ex) {
+        super("Builder Exception: [" + builder.name() + "] " + message, ex);
+    }
+}
