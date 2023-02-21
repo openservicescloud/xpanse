@@ -23,7 +23,6 @@
         <module>ocl-loader</module>
         <module>orchestrator</module>
         <module>api</module>
-        <module>xpansedeployengin</module>
         <module>database</module>
     </modules>
 
