@@ -1,0 +1,15 @@
+.xpanse-intergration-main{
+  display: grid;
+  grid-template-columns: 280px minmax(300px, 600px);
+  grid-template-rows: repeat(1, minmax(0px, 1fr));
+}
+.xpanse-intergration-subleft{
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.xpanse-intergration-subright{
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
