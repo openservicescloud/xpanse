@@ -11,34 +11,34 @@ import {Aws, Google, Upcloud} from "./SvgObjects";
 function HuaWeiCloudServices(props) {
   const [term] = useState([{
     key: '1',
-    label: `Term 1`,
-    children: `Content of Tab Pane 1`,
+    label: `Africa`,
+    children: <button>hobbyist</button>,
   },
     {
       key: '2',
-      label: `Tab 2`,
+      label: `Asia Pacific`,
       children: `Content of Tab Pane 2`,
     },
     {
       key: '3',
-      label: `Tab 3`,
+      label: `Europe`,
       children: `Content of Tab Pane 3`,
     },
   ]);
   const [items, setItems] = useState([
     {
       key: '1',
-      label: `Tab 1`,
+      label: `Hobbyist`,
       children: `Content of Tab Pane 1`,
     },
     {
       key: '2',
-      label: `Tab 2`,
+      label: `Startup`,
       children: `Content of Tab Pane 2`,
     },
     {
       key: '3',
-      label: `Tab 3`,
+      label: `Business`,
       children: `Content of Tab Pane 3`,
     },
   ]);

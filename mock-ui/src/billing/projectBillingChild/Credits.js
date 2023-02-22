@@ -1,15 +1,10 @@
 import {Card, List, Pagination} from 'antd';
 import React from 'react';
-import {useState} from 'react';
+import { useState } from 'react';
 import './Credits.css'
-import {
-  AudioOutlined,
-  ExclamationCircleOutlined,
-  InfoCircleOutlined
-} from '@ant-design/icons';
-import {Input, Space, Table, Tag} from 'antd';
-
-const {Search} = Input;
+import { AudioOutlined, ExclamationCircleOutlined, InfoCircleOutlined} from '@ant-design/icons';
+import { Input, Space, Table, Tag } from 'antd';
+const { Search } = Input;
 
 function Credits(props) {
   const suffix = (
@@ -66,7 +61,7 @@ function Credits(props) {
       CreditCode: 'welcome-3g9h9zm4puze',
       CreditType: 'Free trial credits',
       Credit: 'New York No. 1 Lake Park',
-      RemainingCredit: 'developer',
+      RemainingCredit:  'developer',
       CreditStartDate: 'developer',
       CreditExpiryDate: 'developer'
     },
@@ -75,7 +70,7 @@ function Credits(props) {
       CreditCode: 'welcome-3g9h9zm4puze',
       CreditType: 'Free trial credits',
       Credit: 'New York No. 1 Lake Park',
-      RemainingCredit: 'developer',
+      RemainingCredit:  'developer',
       CreditStartDate: 'developer',
       CreditExpiryDate: 'developer'
     },
@@ -84,21 +79,25 @@ function Credits(props) {
       CreditCode: 'welcome-3g9h9zm4puze',
       CreditType: 'Free trial credits',
       Credit: 'New York No. 1 Lake Park',
-      RemainingCredit: 'developer',
+      RemainingCredit:  'developer',
       CreditStartDate: 'developer',
       CreditExpiryDate: 'developer'
     },
   ];
 
-  return (
+  return(
       <>
         <div className="xpanse-credits-head">
-          <h2>Credits<InfoCircleOutlined/></h2>
-          <div className="xpanse-available-credits-left">
-            <h2>Available Credits</h2>
-            <p className="xpanse-BillingGroupCreditsTab-available-credits-card-credits">$
-              300.00 USD</p>
-            <Input placeholder="Basic usage"/>
+          <div className="xpanse-credits-word-head">
+            <h2>Credits<InfoCircleOutlined /></h2>
+            <div className="xpanse-available-credits-left">
+              <h2>Available Credits</h2>
+              <p className="xpanse-BillingGroupCreditsTab-available-credits-card-credits">$ 300.00  USD</p>
+              <Input placeholder="Basic usage" />
+            </div>
+            <div>
+              <button type='button' className='xpanse-Credit-Button'>Claim credits</button>
+            </div>
           </div>
           <div className="xpanse-search-table-credits-right">
             <div className="xpanse-search-table-right-credit-head">
@@ -113,17 +112,15 @@ function Credits(props) {
                   />
                 </Space>
               </div>
-              <div className="page-credit">
-                <Pagination current={current} onChange={onChange} total={50}/>;
-              </div>
             </div>
             <div className="search-code">
-              <Table columns={columns} dataSource={data}/>
+              <Table columns={columns} dataSource={data} />
             </div>
           </div>
         </div>
       </>
   )
 }
+
 
 export default Credits;

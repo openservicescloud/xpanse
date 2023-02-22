@@ -1,46 +1,53 @@
-.xpanse-credits-head {
-  margin: 10px 0;
-  padding: 10px;
-  width: 600px;
+.xpanse-credits-head{
   display: flex;
+  width: 1200px;
+  height: 600px;
+}
+.xpanse-credits-word-head{
+  margin: 10px;
+  padding: 10px;
+  width: 280px;
   justify-content: space-between;
 }
-
-.xpanse-available-credits-left {
+.xpanse-available-credits-left{
+  width: 250px;
+  height: 150px;
+}
+.xpanse-search-table-credits-right{
   width: 100px;
   height: 50px;
 }
-
-.xpanse-search-table-credits-right {
-  width: 100px;
-  height: 50px;
-}
-
-.xpanse-search-table-right-credit-head {
+.xpanse-search-table-right-credit-head{
   margin: 10px 0;
   padding: 10px;
   width: 900px;
-  /*border: 2px solid #ccc;*/
   display: flex;
   justify-content: space-between;
 }
-
-.search-credit {
+.search-credit{
   width: 100px;
   height: 50px;
+  margin: auto
 }
-
-.page-credit {
+.page-credit{
   width: 300px;
   height: 50px;
 }
-
-.search-code {
+.xpanse-Credit-Button{
+  display: inline-block;
+  background: #DC143C;
+  width: 180px;
+  height: 48px;
+  color: white;
+  font-weight: bold ;
+  border-style:none;
+  float:right;
+}
+.search-code{
   width: 1200px;
 }
-
-.xpanse-BillingGroupCreditsTab-available-credits-card-credits {
-  font-size: 24px;
+.xpanse-BillingGroupCreditsTab-available-credits-card-credits{
+  font-size: 16px;
   color: #333;
   font-weight: 700;
 }
