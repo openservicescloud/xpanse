@@ -3,7 +3,6 @@ import {Datadog,Cloudwatch,Elasticsearch,Jolokia,Syslog} from './IntegrSvgObject
 import IntegrationEndpointsHeader from "./IntegrationEndpointsHeader";
 import IntegrationEndpointsLeft from "./IntegrationEndpointsLeft";
 import IntegrationEndpointsRight from './IntegrationEndpointsRight';
-import {Col, Row} from "antd";
 import { Radio, Space, Tabs } from 'antd';
 
 function IntergrationEndPoints(props) {
@@ -18,29 +17,6 @@ function IntergrationEndPoints(props) {
       children: Datadog,
     }]);
 
-  // const list = [
-  //   {
-  //     picture: Datadog,
-  //     key: '1',
-  //     content: 'Datadog',
-  //   }, {
-  //     picture: Cloudwatch,
-  //     key:'2',
-  //     content: 'AWS Cloudwatch Logs',
-  //   }, {
-  //     picture: Elasticsearch,
-  //     key: '3',
-  //     content: 'External Elasticsearch',
-  //   },{
-  //     picture: Jolokia,
-  //     key:'4',
-  //     content: 'Jolokia',
-  //   },{
-  //     picture: Syslog,
-  //     key:'5',
-  //     content: 'props.id',
-  //   }
-  // ];
   return (
       <>
         <div>
@@ -50,10 +26,11 @@ function IntergrationEndPoints(props) {
             tabPosition={tabPosition}
             items={new Array(5).fill(null).map((_, i) => {
               const id = String(i + 1);
+              const [index, setIndex] = new useState(id);
               return {
-                label: <IntegrationEndpointsLeft/>,
+                label: <IntegrationEndpointsLeft index = {index}/>,
                 key: id,
-                children: <IntegrationEndpointsRight/>,
+                children: <IntegrationEndpointsRight index = {index}/>,
               };
             })}
         />

@@ -8,8 +8,17 @@
   margin: 0;
   padding: 0;
 }
-.xpanse-intergration-subright{
+.xpanse-intergration-header{
   display: flex;
+  justify-content: center;
   flex-direction: column;
   gap: 16px;
+  margin-bottom: 24px;
+}
+.xpanse-intergration-header-content{
+  display: grid;
+  grid-template-columns: repeat(1, minmax(0px, 1fr));
+  grid-template-rows: repeat(1, minmax(0px, 1fr));
+  max-width: 72rem;
+  margin-bottom: 24px;
 }
