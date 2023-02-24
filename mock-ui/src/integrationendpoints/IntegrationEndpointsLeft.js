@@ -22,14 +22,16 @@ function IntegrationEndpointsLeft(props) {
     },{
       picture: Syslog,
       key:'5',
-      content: 'props.id',
+      content: 'Syslog',
     }
   ];
-
+  const id = Number(props.index) - 1;
   return(
       <>
         <a><div>
-          <img src={list[0].picture}/></div></a>
+          <img src={list[id].picture}/>
+          {list[id].content}
+         </div></a>
       </>
   )
 

@@ -1,0 +1,46 @@
+.xpanse-credits-head {
+  margin: 10px 0;
+  padding: 10px;
+  width: 600px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.xpanse-available-credits-left {
+  width: 100px;
+  height: 50px;
+}
+
+.xpanse-search-table-credits-right {
+  width: 100px;
+  height: 50px;
+}
+
+.xpanse-search-table-right-credit-head {
+  margin: 10px 0;
+  padding: 10px;
+  width: 900px;
+  /*border: 2px solid #ccc;*/
+  display: flex;
+  justify-content: space-between;
+}
+
+.search-credit {
+  width: 100px;
+  height: 50px;
+}
+
+.page-credit {
+  width: 300px;
+  height: 50px;
+}
+
+.search-code {
+  width: 1200px;
+}
+
+.xpanse-BillingGroupCreditsTab-available-credits-card-credits {
+  font-size: 24px;
+  color: #333;
+  font-weight: 700;
+}
