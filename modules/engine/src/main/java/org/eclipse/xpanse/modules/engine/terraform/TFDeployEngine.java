@@ -1,22 +1,22 @@
 package org.eclipse.xpanse.modules.engine.terraform;
 
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.eclipse.xpanse.modules.engine.XpanseDeployEngine;
-import org.eclipse.xpanse.modules.engine.XpanseDeployResponse;
-import org.eclipse.xpanse.modules.engine.XpanseDeployTask;
-import org.eclipse.xpanse.modules.engine.terraform.exceptions.TFExecutorException;
-import org.eclipse.xpanse.modules.engine.xpresource.XpResource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.eclipse.xpanse.modules.engine.XpanseDeployEngine;
+import org.eclipse.xpanse.modules.engine.XpanseDeployResponse;
+import org.eclipse.xpanse.modules.engine.XpanseDeployTask;
+import org.eclipse.xpanse.modules.engine.XpanseHandler;
+import org.eclipse.xpanse.modules.engine.terraform.exceptions.TFExecutorException;
+import org.eclipse.xpanse.modules.engine.xpresource.XpResource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 @Slf4j
 @Component
