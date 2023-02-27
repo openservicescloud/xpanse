@@ -9,7 +9,7 @@ import Protected from './components/content/ProtectedRoute';
 import {billingPageRoute, homePageRoute, servicesPageRoute} from './components/utils/constants';
 import Services from "./components/content/services/Services";
 import Billing from "./components/content/billing/Billing";
-
+import IntegrationEndpoints from "./components/content/integration/IntegrationEndpoints";
 function App() {
   return (
       // <div className="App">
@@ -51,15 +51,21 @@ function App() {
                  </Protected>
                }
         />
+        <Route path={'/billing'}
+               element={
+                 <Protected>
+                   <Billing/>
+                 </Protected>
+               }
+        />
+        <Route path={'/integration-endpoints'}
+               element={
+                 <Protected>
+                   <IntegrationEndpoints/>
+                 </Protected>
+               }
+        />
         <Route path="*" element={<LoginScreen/>}/>
-
-        {/*<Route path={billingPageRoute}*/}
-        {/*       element={*/}
-        {/*         <Protected>*/}
-        {/*           <Billing/>*/}
-        {/*         </Protected>*/}
-        {/*       }*/}
-        {/*/>*/}
       </Routes>
   );
 }
