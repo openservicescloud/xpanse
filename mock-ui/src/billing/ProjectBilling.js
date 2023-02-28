@@ -46,7 +46,7 @@ function ProjectBilling(props) {
             <div className="xpanse-BillingGroupHeader-detail-title">Current
               accumulated monthly bill
             </div>
-            <div className="aiven-BillingGroupHeader-detail-balance">$ 11.37
+            <div className="xpanse-BillingGroupHeader-detail-balance">$ 11.37
               USD
             </div>
             <div className="xpanse-BillingGroupHeader-detail-payment">No credit

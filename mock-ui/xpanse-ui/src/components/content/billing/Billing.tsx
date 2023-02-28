@@ -42,13 +42,13 @@ function Billing() {
   return (
       <>
         <Breadcrumb>
-        <Breadcrumb.Item><Link to={'/'}><HomeOutlined/><span>Home</span></Link></Breadcrumb.Item>
-        <Breadcrumb.Item>Billing</Breadcrumb.Item>
-      </Breadcrumb>
+          <Breadcrumb.Item><Link to={'/'}><HomeOutlined/><span>Home</span></Link></Breadcrumb.Item>
+          <Breadcrumb.Item>Billing</Breadcrumb.Item>
+        </Breadcrumb>
 
-        <div>
-          <h1 className="typography-heading text-grey-80">Project Billing</h1>
-        </div>
+        {/*<div>*/}
+        {/*  <h1 className="typography-heading">Project Billing</h1>*/}
+        {/*</div>*/}
         <div className="xpanse-BillingGroupHeader">
           <div className="typography-heading">
             <h1>User-1030</h1>
@@ -57,7 +57,7 @@ function Billing() {
             <div className="xpanse-BillingGroupHeader-detail-title">Current
               accumulated monthly bill
             </div>
-            <div className="aiven-BillingGroupHeader-detail-balance">$ 11.37
+            <div className="xpanse-BillingGroupHeader-detail-balance">$ 11.37
               USD
             </div>
             <div className="xpanse-BillingGroupHeader-detail-payment">No credit
@@ -65,12 +65,12 @@ function Billing() {
             </div>
           </div>
         </div>
-        <div>
+        <div className='xpanse-BillingGroupHeader-Waring'>
           <div><WarningOutlined/>Waring</div>
           <div>There is no payment method set up for this project.</div>
         </div>
         <div>
-          <Tabs defaultActiveKey="1" items={items} onChange={onChange}/>;
+          <Tabs defaultActiveKey="1" items={items} onChange={onChange}/>
         </div>
       </>
   )

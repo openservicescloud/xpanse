@@ -7,12 +7,12 @@
 }
 
 .typography-heading {
-  width: 100px;
+  width: 150px;
   height: 50px;
 }
 
 .xpanse-BillingGroupHeader-detail-container {
-  width: 100px;
+  width: 200px;
   height: 50px;
   text-align: right;
 }
@@ -26,7 +26,7 @@
   text-align: right;
 }
 
-.aiven-BillingGroupHeader-detail-balance {
+.xpanse-BillingGroupHeader-detail-balance {
   color: #333;
   font-size: 24px;
   font-weight: 700;
@@ -42,4 +42,25 @@
   text-align: right;
   white-space: nowrap;
   text-align: right;
+}
+
+.xpanse-BillingGroupHeader-Waring{
+  font-size: 12px;
+  line-height: 126%;
+  letter-spacing: .033em;
+  color: #DC143C;
+  white-space: nowrap;
+  text-align: left;
+}
+.xpanse-BillingOverview-TableHeader{
+  margin: 10px 0;
+  padding: 10px;
+  width: 1500px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.xpanse-BillingOverview-TableHeaderContent{
+  height: 20px;
+  margin-top: 25px;
 }

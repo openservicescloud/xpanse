@@ -2,17 +2,17 @@ import React, {useState} from 'react';
 import '../../../../styles/billing/billing.css'
 import {Table} from 'antd';
 
-function Overview(props) {
+function Overview(props : any) {
   const columns = [
     {
       title: 'Period',
       dataIndex: 'period',
       key: 'period',
-      render: (text) => <a>{text}</a>,
+      // render: (text : any) => <a>{text}</a>,
     },
     {
       title: 'Billing Group',
-      dataIndex: 'billing group',
+      dataIndex: 'billinggroup',
       key: 'billing group',
     },
     {
@@ -44,7 +44,7 @@ function Overview(props) {
     {
       key: '1',
       period: 'Feb 1 -Feb 28,2023',
-      billinggroup: '32',
+      billinggroup: 'Default billing group for alice-1030',
       state: 'New York No. 1 Lake Park',
       amount: ['nice', 'developer'],
       tax: '1',
@@ -53,7 +53,21 @@ function Overview(props) {
   ];
   return (
       <>
-        <Table columns={columns} dataSource={data}/>;
+        <div className="xpanse-BillingOverview-TableHeader">
+          <h2>Invoices</h2>
+
+          <div className="xpanse-BillingOverview-TableHeaderContent">
+            <a href="">All invoices</a>
+          </div>
+        </div>
+        <Table columns={columns} dataSource={data}/>
+        <div className="xpanse-BillingOverview-TableHeader">
+          <h2>Credits</h2>
+          <div className="xpanse-BillingOverview-TableHeaderContent">
+            <a href="">All credits</a>
+          </div>
+        </div>
+        <Table columns={columns} dataSource={data}/>
       </>
   )
 }
