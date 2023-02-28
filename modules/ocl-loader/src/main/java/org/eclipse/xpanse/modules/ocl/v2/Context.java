@@ -1,12 +1,24 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: Huawei Inc.
+ *
+ */
+
 package org.eclipse.xpanse.modules.ocl.v2;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.util.Map;
 import lombok.Data;
 
+
+/**
+ * Defines the content of the service.
+ */
 @Data
+@Valid
 public class Context {
 
     @NotEmpty
