@@ -121,6 +121,7 @@ public class XpanseTaskServiceImpl implements XpanseTaskService {
 
         ServiceTaskEntity newTaskEntity = getNewServiceTaskEntity(oclResource);
         try {
+            this.databaseServiceTaskStorage.store(newTaskEntity);
             putServiceInfoIntoLogMdc(newTaskEntity);
             XpanseDeployResponse deployResponse = deployEngine.deploy(
                     newTaskEntity.getDeployTask());
@@ -150,8 +151,7 @@ public class XpanseTaskServiceImpl implements XpanseTaskService {
             putServiceInfoIntoLogMdc(serviceTaskEntity);
             deployEngine.destroy(serviceTaskEntity.getDeployTask());
             serviceTaskEntity.setIsDeleted(true);
-            this.databaseServiceTaskStorage.store(serviceTaskEntity);
-//            this.databaseServiceTaskStorage.removeById(serviceTaskEntity.getId());
+            this.databaseServiceTaskStorage.removeById(serviceTaskEntity.getId());
         } catch (RuntimeException exception) {
             updateFailedServiceTaskEntity(serviceTaskEntity, exception);
             this.databaseServiceTaskStorage.store(serviceTaskEntity);

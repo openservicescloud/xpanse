@@ -10,7 +10,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 /**
- * Error response for the REST API.
+ * Response for the REST API.
  */
 @Data
 public class Response {

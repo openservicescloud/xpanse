@@ -93,7 +93,6 @@ public class XpanseDeployApi {
     public Response monitorData(@PathVariable("vmId")String vmId) {
         String successMsg = "Get monitor data success.";
         String monitor = xpanseTaskService.showMonitorData(vmId);
-
         return Response.resultResponse(successMsg, monitor);
     }
 
