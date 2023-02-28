@@ -7,24 +7,26 @@
 package org.eclipse.xpanse.modules.engine.monitor.resource;
 
 import java.util.Date;
-import org.eclipse.xpanse.modules.engine.xpresource.XpResource;
+import org.eclipse.xpanse.modules.engine.xpresource.XpanseResource;
 import org.springframework.stereotype.Component;
 
 /**
- * @Description: Resource conversion
- * @ClassName: MonitorResourceHandler
- * @Author:
- * @Date: 2023/2/20 15:02
- * @Version: 1.0
+ * Resource conversion.
  */
 @Component
 public class MonitorResourceHandler {
 
-    public MonitorResource handler(XpResource xpResource) {
+    /**
+     * resource conversion.
+     *
+     * @param xpanseResource Service Source.
+     * @return MonitorResource Monitor Source.
+     */
+    public MonitorResource handler(XpanseResource xpanseResource) {
         MonitorResource monitorResource = new MonitorResource();
-        String id = xpResource.getXpResourceKind().getXpResourceVm().getId();
+        String id = xpanseResource.getXpResourceKind().getXpResourceVm().getId();
         monitorResource.setDim0("instance_id," + id);
-        monitorResource.setRegion(xpResource.getRegion());
+        monitorResource.setRegion(xpanseResource.getRegion());
         monitorResource.setNamespace("SYS.ECS");
         monitorResource.setPeriod(1);
         monitorResource.setFilter("average");

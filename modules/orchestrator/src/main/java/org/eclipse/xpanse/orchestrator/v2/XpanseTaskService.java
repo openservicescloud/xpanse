@@ -8,8 +8,6 @@ package org.eclipse.xpanse.orchestrator.v2;
 
 import java.util.List;
 import org.eclipse.xpanse.modules.database.v2.ServiceTaskEntity;
-import org.eclipse.xpanse.modules.engine.XpanseDeployTask;
-import org.eclipse.xpanse.modules.engine.xpresource.XpResource;
 import org.eclipse.xpanse.modules.ocl.v2.Context;
 import org.eclipse.xpanse.modules.ocl.v2.Flavor;
 import org.eclipse.xpanse.modules.ocl.v2.OclResource;
@@ -32,7 +30,7 @@ public interface XpanseTaskService {
     /**
      * Delete the service using the ID.
      *
-     * @param taskId   the service ID to stop.
+     * @param taskId      the service ID to stop.
      * @param oclResource the OCLResource model describing the service.
      */
     void deleteService(String taskId, OclResource oclResource);

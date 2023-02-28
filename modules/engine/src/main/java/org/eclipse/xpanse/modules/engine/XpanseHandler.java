@@ -1,18 +1,20 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: Huawei Inc.
+ *
+ */
+
 package org.eclipse.xpanse.modules.engine;
 
-import org.eclipse.xpanse.modules.engine.xpresource.XpResource;
-
 import java.util.List;
+import org.eclipse.xpanse.modules.engine.xpresource.XpanseResource;
 
 /**
- * @Description:
- * @ClassName: XpanseHandler
- * @Author: yy
- * @Date: 2023/2/16 17:02
- * @Version: 1.0
+ * this Interface Process the execution result of XpanseDeployEngine and return the XpanseResource
+ * format.
  */
 public interface XpanseHandler {
 
-    List<XpResource> handler(XpanseDeployTask task);
+    List<XpanseResource> handler(XpanseDeployTask task);
 
 }
