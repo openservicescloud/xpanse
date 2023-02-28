@@ -6,6 +6,9 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.xpanse.api.response.Response;
 import org.eclipse.xpanse.modules.database.v2.ServiceTaskEntity;
+import org.eclipse.xpanse.modules.engine.XpanseDeployTask;
+import org.eclipse.xpanse.modules.engine.XpanseMonitor;
+import org.eclipse.xpanse.modules.engine.xpresource.XpResource;
 import org.eclipse.xpanse.modules.ocl.v2.Context;
 import org.eclipse.xpanse.modules.ocl.v2.OclResource;
 import org.eclipse.xpanse.orchestrator.v2.XpanseTaskService;
@@ -78,6 +81,20 @@ public class XpanseDeployApi {
         List<ServiceTaskEntity> tasks = xpanseTaskService.listServiceTasks();
 
         return Response.resultResponse(successMsg, tasks);
+    }
+
+    /**
+     * Get service monitor data
+     *
+     * @return response
+     */
+    @GetMapping(value = "/service/monitor/{vmId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public Response monitorData(@PathVariable("vmId")String vmId) {
+        String successMsg = "Get monitor data success.";
+        String monitor = xpanseTaskService.showMonitorData(vmId);
+
+        return Response.resultResponse(successMsg, monitor);
     }
 
     /**

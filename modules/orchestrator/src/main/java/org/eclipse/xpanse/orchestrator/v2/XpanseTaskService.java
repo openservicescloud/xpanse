@@ -8,6 +8,8 @@ package org.eclipse.xpanse.orchestrator.v2;
 
 import java.util.List;
 import org.eclipse.xpanse.modules.database.v2.ServiceTaskEntity;
+import org.eclipse.xpanse.modules.engine.XpanseDeployTask;
+import org.eclipse.xpanse.modules.engine.xpresource.XpResource;
 import org.eclipse.xpanse.modules.ocl.v2.Context;
 import org.eclipse.xpanse.modules.ocl.v2.Flavor;
 import org.eclipse.xpanse.modules.ocl.v2.OclResource;
@@ -55,5 +57,10 @@ public interface XpanseTaskService {
      * List flavors of service by serviceName.
      */
     List<Flavor> listServiceFlavors(String serviceName);
+
+    /**
+     * List all monitor data.
+     */
+    String showMonitorData(String vmId);
 
 }
