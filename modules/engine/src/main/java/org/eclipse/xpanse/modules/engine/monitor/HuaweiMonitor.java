@@ -1,3 +1,9 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: Huawei Inc.
+ *
+ */
+
 package org.eclipse.xpanse.modules.engine.monitor;
 
 import com.huaweicloud.sdk.ces.v1.CesClient;
@@ -17,6 +23,13 @@ import org.eclipse.xpanse.modules.engine.monitor.resource.MonitorResourceHandler
 import org.eclipse.xpanse.modules.engine.xpresource.XpResource;
 import org.springframework.stereotype.Component;
 
+/**
+ * @Description: Plugin to git monitor data on Huawei cloud.
+ * @ClassName: HuaweiMonitor
+ * @Author:
+ * @Date: 2023/2/20 16:02
+ * @Version: 1.0
+ */
 @Component
 public class HuaweiMonitor implements XpanseMonitor {
 
@@ -27,15 +40,15 @@ public class HuaweiMonitor implements XpanseMonitor {
         String sk = task.getContext().get("SK");
 
         ICredential auth = new BasicCredentials()
-            .withAk(ak)
-            .withSk(sk);
+                .withAk(ak)
+                .withSk(sk);
         MonitorResourceHandler monitorResourceHandler = new MonitorResourceHandler();
         MonitorResource monitorResource = monitorResourceHandler.handler(xpResource);
-            CesClient client = CesClient.newBuilder()
+        CesClient client = CesClient.newBuilder()
                 .withCredential(auth)
                 .withRegion(CesRegion.valueOf(monitorResource.getRegion()))
                 .build();
-            ShowMetricDataRequest request = new ShowMetricDataRequest()
+        ShowMetricDataRequest request = new ShowMetricDataRequest()
                 .withNamespace(monitorResource.getNamespace())
                 .withMetricName("cpu_util")
                 .withDim0(monitorResource.getDim0())
@@ -43,20 +56,20 @@ public class HuaweiMonitor implements XpanseMonitor {
                 .withPeriod(monitorResource.getPeriod())
                 .withFrom(Long.valueOf(monitorResource.getFrom()))
                 .withTo(Long.valueOf(monitorResource.getTo()));
-            try {
-                ShowMetricDataResponse response = client.showMetricData(request);
-                return response.toString();
-            } catch (ConnectionException e) {
-                e.printStackTrace();
-            } catch (RequestTimeoutException e) {
-                e.printStackTrace();
-            } catch (ServiceResponseException e) {
-                e.printStackTrace();
-                System.out.println(e.getHttpStatusCode());
-                System.out.println(e.getRequestId());
-                System.out.println(e.getErrorCode());
-                System.out.println(e.getErrorMsg());
-            }
+        try {
+            ShowMetricDataResponse response = client.showMetricData(request);
+            return response.toString();
+        } catch (ConnectionException e) {
+            e.printStackTrace();
+        } catch (RequestTimeoutException e) {
+            e.printStackTrace();
+        } catch (ServiceResponseException e) {
+            e.printStackTrace();
+            System.out.println(e.getHttpStatusCode());
+            System.out.println(e.getRequestId());
+            System.out.println(e.getErrorCode());
+            System.out.println(e.getErrorMsg());
+        }
         return null;
     }
 
@@ -67,15 +80,15 @@ public class HuaweiMonitor implements XpanseMonitor {
         String sk = task.getContext().get("SK");
 
         ICredential auth = new BasicCredentials()
-            .withAk(ak)
-            .withSk(sk);
+                .withAk(ak)
+                .withSk(sk);
         MonitorResourceHandler monitorResourceHandler = new MonitorResourceHandler();
         MonitorResource monitorResource = monitorResourceHandler.handler(xpResource);
-            CesClient client = CesClient.newBuilder()
+        CesClient client = CesClient.newBuilder()
                 .withCredential(auth)
                 .withRegion(CesRegion.valueOf(monitorResource.getRegion()))
                 .build();
-            ShowMetricDataRequest request = new ShowMetricDataRequest()
+        ShowMetricDataRequest request = new ShowMetricDataRequest()
                 .withNamespace(monitorResource.getNamespace())
                 .withMetricName("mem_util")
                 .withDim0(monitorResource.getDim0())
@@ -83,20 +96,20 @@ public class HuaweiMonitor implements XpanseMonitor {
                 .withPeriod(monitorResource.getPeriod())
                 .withFrom(Long.valueOf(monitorResource.getFrom()))
                 .withTo(Long.valueOf(monitorResource.getTo()));
-            try {
-                ShowMetricDataResponse response = client.showMetricData(request);
-                return response.toString();
-            } catch (ConnectionException e) {
-                e.printStackTrace();
-            } catch (RequestTimeoutException e) {
-                e.printStackTrace();
-            } catch (ServiceResponseException e) {
-                e.printStackTrace();
-                System.out.println(e.getHttpStatusCode());
-                System.out.println(e.getRequestId());
-                System.out.println(e.getErrorCode());
-                System.out.println(e.getErrorMsg());
-            }
+        try {
+            ShowMetricDataResponse response = client.showMetricData(request);
+            return response.toString();
+        } catch (ConnectionException e) {
+            e.printStackTrace();
+        } catch (RequestTimeoutException e) {
+            e.printStackTrace();
+        } catch (ServiceResponseException e) {
+            e.printStackTrace();
+            System.out.println(e.getHttpStatusCode());
+            System.out.println(e.getRequestId());
+            System.out.println(e.getErrorCode());
+            System.out.println(e.getErrorMsg());
+        }
         return null;
     }
 }
