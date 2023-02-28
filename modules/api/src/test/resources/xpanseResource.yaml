@@ -1,0 +1,103 @@
+# The version of the OCL
+version: 2.0
+# The Service provided by the ISV, the name will be shown on the console as a service.
+name: kafka
+# The version of the service, if the end-user want to select the version when they want to deploy the service.
+service_version: v1.0
+# For the users may have more than one service, the @namespace can be used to separate the clusters.
+description: This is an ehanced kafka services by ISV-A.
+namespace: ISV-A
+# Icon for the service.
+icon: |
+  data:image/svg+xml;base64,PCEtLQogIC0gU1BEWC1MaWNlbnNlLUlkZW50aWZpZXI6IEFwYWNoZS0yLjAKICAtIFN
+  QRFgtRmlsZUNvcHlyaWdodFRleHQ6IEh1YXdlaSBJbmMuCiAgLQogIC0tPgoKPHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9
+  IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI
+# Reserved for CSP, aws,azure,ali,huawei and ...
+cloud_service_provider:
+  name: huawei
+  regions:
+    - cn-north-4
+    - cn-southwest-2
+billing:
+    # The business model(`flat`, `exponential`, ...)
+    model: flat
+    # The rental period (`daily`, `weekly`, `monthly`, `yearly`)
+    period: monthly
+    # The billing currency (`euro`, `usd`, ...)
+    currency: euro
+# The flavor of the service, the @name/@version/@flavor can locate the specific service to be deployed.
+flavors:
+  - name: 3-node-without-zookeeper
+    # The fixed price during the period (the price applied one shot whatever is the service use)
+    fixedPrice: 20
+    # Properties for the service, which can be used by the deployment.
+    property:
+      node: 3
+      zookeeper: false
+  - name: 5-node-with-zookeeper
+    # The fixed price during the period (the price applied one shot whatever is the service use)
+    fixedPrice: 30
+    # Properties for the service, which can be used by the deployment.
+    property:
+      node: 5
+      zookeeper: true
+deployment:
+  # Context for deployment: the context including some kind of parameters for the deployment, such as fix,variable.
+  # - fix: The value of the fix parameters are defined by the ISV with the @value at the initial time.
+  # - variable: The value of the variable parameters are defined by the user on the console.
+  # The parameters will be used to generate the API of the managed service.
+  context:
+    - name: AK
+      description: Your access key.
+      kind: fix
+      type: string
+      value: xxxxxxxxxx
+      madatory: true
+      validator: null
+    - name: SK
+      description: Your security key.
+      kind: fix
+      type: string
+      value: xxxxxxxxxxx
+      madatory: true
+      validator: null
+    - name: VPC
+      description: The vpc you want to deploy, If null, A new vpc will be created.
+      kind: variable
+      type: string
+      madatory: false
+      validator: length(1-256)
+  # Deployer: Supported values are terraform, plulumi, crossplane.
+  deployer:
+    terraform: |
+      variable "secgroup_id" {}
+
+      data "huaweicloud_availability_zones" "myaz" {}
+
+      data "huaweicloud_compute_flavors" "myflavor" {
+        availability_zone = data.huaweicloud_availability_zones.myaz.names[0]
+        performance_type  = "normal"
+        cpu_core_count    = 2
+        memory_size       = 4
+      }
+
+        data "huaweicloud_vpc_subnet" "mynet" {
+        name = "subnet-default"
+      }
+
+        data "huaweicloud_images_image" "myimage" {
+        name        = "Ubuntu 18.04 server 64bit"
+        most_recent = true
+      }
+
+        resource "huaweicloud_compute_instance" "basic" {
+        name               = "basic"
+        image_id           = data.huaweicloud_images_image.myimage.id
+        flavor_id          = data.huaweicloud_compute_flavors.myflavor.ids[0]
+        security_group_ids = [var.secgroup_id]
+        availability_zone  = data.huaweicloud_availability_zones.myaz.names[0]
+
+        network {
+        uuid = data.huaweicloud_vpc_subnet.mynet.id
+      }
+      }
