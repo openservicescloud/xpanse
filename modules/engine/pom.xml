@@ -45,6 +45,11 @@
             <artifactId>mockito-core</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.huaweicloud.sdk</groupId>
+            <artifactId>huaweicloud-sdk-ces</artifactId>
+            <version>3.1.26</version>
+        </dependency>
     </dependencies>
 
     <properties>
