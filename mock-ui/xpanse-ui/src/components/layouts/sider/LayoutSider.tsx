@@ -16,6 +16,9 @@ function LayoutSider(): JSX.Element {
       key: "/billing",
       label: "Billing",
     }, {
+      key: "/integration-endpoints",
+      label: "IntegrationEndpoints",
+    },{
       key: "sub3",
       label: "subnav 3",
       children: [
@@ -29,7 +32,7 @@ function LayoutSider(): JSX.Element {
         <Layout.Sider collapsible collapsed={collapsed} onCollapse={(newValue) => setCollapsed(newValue)}>
           <div className="logo">
             <Link to={homePageRoute}>
-              <Image width={50} src="./logo.png" preview={false}/>
+              <Image width={50} src="./huawei_logo.png" preview={false}/>
             </Link>
           </div>
           <Menu items={item} mode="inline" theme="dark" onSelect={onSelected}/>
