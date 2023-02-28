@@ -4,107 +4,72 @@ sidebar_position: 4
 
 # Runtime
 
-Open Services Cloud runtime is the running module. It packages and executes all together: OCL loader, orchestrator, plugins, REST API, ...
+Open Services Cloud runtime is the running module. It packages and executes all together: OCL loader, orchestrator,
+plugins, REST API, ...
 
 ## Build
 
-You can easily build OSC yourself.
+You can easily build Xpanse yourself.
 
 As requirement, you need:
-* a Java Developer Kit (JDK) installed, version 11 or newer. You can use [openjdk](https://openjdk.org/) or [temurin](https://adoptium.net/)
+
+* a Java Developer Kit (JDK) installed, version 17 or newer. You can use [openjdk](https://openjdk.org/)
+  or [temurin](https://adoptium.net/)
 * [Apache Maven 3.8.x or newer](https://maven.apache.org/)
 
 You can clone the project locally on your machine with:
 
 ```shell
-$ git clone https://github.com/huaweicloud/osc
-$ cd osc
+$ git clone https://github.com/huaweicloud/xpanse
+$ cd xpanse
 ```
 
-You can build the whole project with:
+First, you can build the whole xpanse project, including all modules (orchestrator, OCL, runtime, plugins, etc), simply
+with:
 
 ```shell
 $ mvn clean install
 ```
 
-It builds the whole project, including the runtime (located in the `runtime/target/runtime` folder).
-This runtime is the default one without any plugin.
+### Run
 
-We provide profiles dedicated to build prepackaged runtimes (including specific plugins):
+By default, the application will not activate any plugins. They must be activated via spring profiles. Also ensure that
+only one plugin is active at a time.
 
-* Huawei Cloud runtime:
+* for Huawei Cloud:
 
 ```shell
-$ mvn clean install -Phuaweicloud
+$ cd runtime/target
+$ java -jar xpanse-runtime-1.0.0-SNAPSHOT.jar -Dspring.profiles.active=huaweicloud
 ```
 
-You can build only the runtime (once you built completely the project):
+* for Openstack:
 
 ```shell
-$ mvn clean install -Phuaweicloud -pl runtime
+$ cd runtime/target
+$ java -jar xpanse-runtime-1.0.0-SNAPSHOT.jar -Dspring.profiles.active=openstack
 ```
 
-* Openstack runtime
+By default, the runtime is built in "exploded mode". Additionally, you can also build a Docker image
+adding `-Ddocker.skip=false` as build argument:
 
 ```shell
-$ mvn clean install -Popenstack
+$ cd runtime
+$ mvn clean install -Ddocker.skip=false
 ```
 
-You can build only the runtime (once you built completely the project):
+We can start xpanse runtime with a specific plugin by passing the plugin name in the profile name. For example to start
+huaweicloud
 
 ```shell
-$ mvn clean install -Popenstack -pl runtime
+$ docker run -e "SPRING_PROFILES_ACTIVE=huaweicloud" --name my-osc-runtime osc
 ```
 
-* Kubernetes runtime
-
-```shell
-$ mvn clean install -Pk8s
-```
-
-You can build only the runtime (once you built completely the project):
-
-```shell
-$ mvn clean install -Pk8s -pl runtime
-```
-
-You can also build corresponding Docker image by adding `-Ddocker.skip=false` argument to the build command:
-
-```shell
-$ mvn clean install -Phuaweicloud -Ddocker.skip=false
-```
-
-## Launch
-
-### Exploded mode
-
-The runtime is built and available in `runtime/target/runtime` folder by default, where you can directly launch the runtime.
-
-To launch the runtime, go into the exploded folder and launch minho-boot jar:
-
-```shell
-$ cd runtime/target/runtime
-$ java -jar minho-boot-1.0-SNAPSHOT.jar
 ```
 
 You can see the log messages:
 
 ```shell
-...
-Jan 02, 2023 6:48:31 AM org.apache.karaf.minho.boot.service.ServiceRegistry add
-INFO: Adding minho-rest-service service (1000)
-Jan 02, 2023 6:48:31 AM org.apache.karaf.minho.rest.jersey.JerseyRestService onRegister
-INFO: Starting minho-rest-service
-Jan 02, 2023 6:48:31 AM org.apache.karaf.minho.rest.jersey.JerseyRestService onRegister
-INFO:   path: /osc/*
-Jan 02, 2023 6:48:31 AM org.apache.karaf.minho.rest.jersey.JerseyRestService onRegister
-INFO:   packages: org.eclipse.osc.modules.api
-Jan 02, 2023 6:48:31 AM org.apache.karaf.minho.web.jetty.JettyWebContainerService addServlet
-INFO: Adding servlet java.lang.Class with context /osc/*
-Jan 02, 2023 6:48:31 AM org.apache.karaf.minho.boot.service.ServiceRegistry add
-INFO: Adding minho-banner-service service (2147483647)
-Jan 02, 2023 6:48:31 AM org.apache.karaf.minho.banner.WelcomeBannerService onRegister
-INFO: 
   ___                     ____                  _                  ____ _                 _
  / _ \ _ __   ___ _ __   / ___|  ___ _ ____   _(_) ___ ___  ___   / ___| | ___  _   _  __| |
 | | | | '_ \ / _ \ '_ \  \___ \ / _ \ '__\ \ / / |/ __/ _ \/ __| | |   | |/ _ \| | | |/ _` |
@@ -113,31 +78,19 @@ INFO:
       |_|
 
         Open Services Cloud 1.0.0-SNAPSHOT (2023)
+11:14:08.843 [main] INFO  o.eclipse.osc.runtime.OscApplication - Starting OscApplication using Java 17.0.5 with PID 20664
+11:14:08.849 [main] INFO  o.eclipse.osc.runtime.OscApplication - No active profile set, falling back to 1 default profile: "default"
+11:14:10.600 [main] INFO  o.e.o.o.FileOrchestratorStorage - No other storage beans found. Using default file storage.
+11:14:11.641 [main] WARN  o.e.o.o.OrchestratorService - No OSC plugins are available
+11:14:11.644 [main] INFO  o.eclipse.osc.runtime.OscApplication - Started OscApplication in 3.252 seconds (process running for 3.818)
 
-Jan 02, 2023 6:48:31 AM org.apache.karaf.minho.boot.service.ServiceRegistry lambda$start$2
-INFO: Starting services
-Jan 02, 2023 6:48:31 AM org.apache.karaf.minho.boot.service.LifeCycleService start
-INFO: Starting lifecycle service
-Jan 02, 2023 6:48:31 AM org.eclipse.jetty.server.Server doStart
-INFO: jetty-11.0.12; built: 2022-09-14T02:38:00.723Z; git: d5b8c29485f5f56a14be5f20c2ccce81b93c5555; jvm 11.0.12+8-LTS-237
-Jan 02, 2023 6:48:31 AM org.eclipse.jetty.server.session.DefaultSessionIdManager doStart
-INFO: Session workerName=node0
-Jan 02, 2023 6:48:31 AM org.glassfish.jersey.server.wadl.WadlFeature configure
-WARNING: JAXBContext implementation could not be found. WADL feature is disabled.
-Jan 02, 2023 6:48:31 AM org.eclipse.jetty.server.handler.ContextHandler doStart
-INFO: Started o.e.j.s.ServletContextHandler@108531c2{/,null,AVAILABLE}
-Jan 02, 2023 6:48:31 AM org.eclipse.jetty.server.AbstractConnector doStart
-INFO: Started ServerConnector@9cb8225{HTTP/1.1, (http/1.1)}{0.0.0.0:8080}
-Jan 02, 2023 6:48:31 AM org.eclipse.jetty.server.Server doStart
-INFO: Started Server@68f4865{STARTING}[11.0.12,sto=0] @846ms
-Jan 02, 2023 6:48:31 AM org.eclipse.osc.orchestrator.OrchestratorService lambda$onRegister$2
-INFO: Loading OSC orchestrator plugins
 ```
 
-The OSC REST API is now available. You can check the status of the runtime by calling the health endpoint on the REST API:
+The Xpanse REST API is now available. You can check the status of the runtime by calling the health endpoint on the REST
+API:
 
 ```shell
-$ curl -XGET http://localhost:8080/osc/health
+$ curl -XGET http://localhost:8080/xpanse/health
 ready
 ```
 
@@ -148,64 +101,43 @@ If you use `-Ddocker.skip=false` as option on the build command line, you have d
 You can see the docker images created:
 
 ```shell
-$ docker images|grep osc
-osc/osc-k8s                     1.0.0-SNAPSHOT   4b716096304b   15 seconds ago   293MB
-osc/osc-k8s                     latest           4b716096304b   15 seconds ago   293MB
-osc/osc-openstack               1.0.0-SNAPSHOT   ffc69547c43f   27 seconds ago   263MB
-osc/osc-openstack               latest           ffc69547c43f   27 seconds ago   263MB
-osc/osc-huaweicloud             1.0.0-SNAPSHOT   d1a6bb77226c   42 seconds ago   264MB
-osc/osc-huaweicloud             latest           d1a6bb77226c   42 seconds ago   264MB
+$ docker images|grep xpanse
+xpanse                   1.0.0-SNAPSHOT   4b716096304b   15 seconds ago   293MB
+xpanse                   latest           4b716096304b   15 seconds ago   293MB
 ```
 
 You can run a docker container with:
 
 ```shell
-$ docker run -d --name my-osc -p 8080:8080 osc/osc-k8s
-$ docker logs my-osc
+$ docker run -d --name my-xpanse -p 8080:8080 xpanse
+$ docker logs my-xpanse
 ...
-Jan 02, 2023 5:54:38 AM org.apache.karaf.minho.boot.service.ServiceRegistry add
-INFO: Adding minho-banner-service service (2147483647)
-Jan 02, 2023 5:54:38 AM org.apache.karaf.minho.banner.WelcomeBannerService onRegister
-INFO: 
-  ___                     ____                  _                  ____ _                 _
- / _ \ _ __   ___ _ __   / ___|  ___ _ ____   _(_) ___ ___  ___   / ___| | ___  _   _  __| |
-| | | | '_ \ / _ \ '_ \  \___ \ / _ \ '__\ \ / / |/ __/ _ \/ __| | |   | |/ _ \| | | |/ _` |
-| |_| | |_) |  __/ | | |  ___) |  __/ |   \ V /| | (_|  __/\__ \ | |___| | (_) | |_| | (_| |
- \___/| .__/ \___|_| |_| |____/ \___|_|    \_/ |_|\___\___||___/  \____|_|\___/ \__,_|\__,_|
-      |_|
+   _  __   ____    ____ _   ____    _____  ___
+  | |/_/  / __ \  / __ `/  / __ \  / ___/ / _ \
+ _>  <   / /_/ / / /_/ /  / / / / (__  ) /  __/
+/_/|_|  / .___/  \__,_/  /_/ /_/ /____/  \___/
+       /_/
 
-        Open Services Cloud 1.0.0-SNAPSHOT (2023)
-
-Jan 02, 2023 5:54:38 AM org.apache.karaf.minho.boot.service.ServiceRegistry lambda$start$2
-INFO: Starting services
-Jan 02, 2023 5:54:38 AM org.apache.karaf.minho.boot.service.LifeCycleService start
-INFO: Starting lifecycle service
-Jan 02, 2023 5:54:38 AM org.eclipse.jetty.server.Server doStart
-INFO: jetty-11.0.12; built: 2022-09-14T02:38:00.723Z; git: d5b8c29485f5f56a14be5f20c2ccce81b93c5555; jvm 11.0.17+8
-Jan 02, 2023 5:54:38 AM org.eclipse.jetty.server.session.DefaultSessionIdManager doStart
-INFO: Session workerName=node0
-Jan 02, 2023 5:54:38 AM org.glassfish.jersey.server.wadl.WadlFeature configure
-WARNING: JAXBContext implementation could not be found. WADL feature is disabled.
-Jan 02, 2023 5:54:38 AM org.eclipse.jetty.server.handler.ContextHandler doStart
-INFO: Started o.e.j.s.ServletContextHandler@703feacd{/,null,AVAILABLE}
-Jan 02, 2023 5:54:38 AM org.eclipse.jetty.server.AbstractConnector doStart
-INFO: Started ServerConnector@16a0ee18{HTTP/1.1, (http/1.1)}{0.0.0.0:8080}
-Jan 02, 2023 5:54:38 AM org.eclipse.jetty.server.Server doStart
-INFO: Started Server@5032714f{STARTING}[11.0.12,sto=0] @1007ms
-Jan 02, 2023 5:54:38 AM org.eclipse.osc.orchestrator.OrchestratorService lambda$onRegister$2
-INFO: Loading OSC orchestrator plugins
+        xpanse 1.0.0-SNAPSHOT (2023)
+13:44:19.633 [main] INFO  o.e.xpanse.runtime.XpanseApplication - Starting XpanseApplication using Java 17.0.5 with PID 7344
+13:44:19.645 [main] INFO  o.e.xpanse.runtime.XpanseApplication - No active profile set, falling back to 1 default profile: "default"
+13:44:22.211 [main] INFO  o.e.x.o.FileOrchestratorStorage - No other storage beans found. Using default file storage.
+13:44:23.878 [main] WARN  o.e.x.o.OrchestratorService - No xpanse plugins loaded by the runtime.
+13:44:23.886 [main] INFO  o.e.xpanse.runtime.XpanseApplication - Started XpanseApplication in 5.029 seconds (process running for 5.992)
 ```
 
-The OSC REST API is now available. You can check the status of the runtime by calling the health endpoint on the REST API:
+The OSC REST API is now available. You can check the status of the runtime by calling the health endpoint on the REST
+API:
 
 ```shell
-$ curl -XGET http://localhost:8080/osc/health
+$ curl -XGET http://localhost:8080/xpanse/health
 ready
 ```
 
 ### Kubernetes
 
-OSC provides all Kubernetes manifest files in the `runtime/src/main/kubernetes` folder, allowing you to deploy all resources on your Kubernetes cluster.
+OSC provides all Kubernetes manifest files in the `runtime/src/main/kubernetes` folder, allowing you to deploy all
+resources on your Kubernetes cluster.
 
 As example, you can deploy on local `minikube` instance. First, start your `minikube` instance:
 
@@ -221,13 +153,6 @@ $ kubectl apply -f runtime/src/main/kubernetes/org.eclipse.osc.namespace.yaml
 namespace/osc created
 ```
 
-Then, you create the `osc-config` configmap in Kubernetes:
-
-```shell
-$ kubectl apply -f runtime/src/main/kubernetes/org.eclipse.osc.configmap.yaml 
-configmap/osc-config created
-```
-
 You can now create the OSC runtime deployment in Kubernetes:
 
 ```shell
@@ -238,66 +163,32 @@ deployment.apps/osc created
 You can check the status of the deployment:
 
 ```shell
-$ kubectl get deployments -n osc
+$ kubectl get deployments -n xpanse
 NAME   READY   UP-TO-DATE   AVAILABLE   AGE
-osc    1/1     1            1           20s
+xpanse    1/1     1            1           20s
 ```
 
 and the associated pod running:
 
 ```shell
-$ kubectl get pods -n osc
+$ kubectl get pods -n xpanse
 NAME                   READY   STATUS    RESTARTS   AGE
 osc-8699fd7547-vj44p   1/1     Running   0          42s
 ```
 
-We can see the logs of the running pod:
-
-```shell
-$ kubectl logs osc-8699fd7547-vj44p -n osc
-...
-Jan 02, 2023 6:26:37 AM org.apache.karaf.minho.banner.WelcomeBannerService onRegister
-INFO: 
-  ___                     ____                  _                  ____ _                 _
- / _ \ _ __   ___ _ __   / ___|  ___ _ ____   _(_) ___ ___  ___   / ___| | ___  _   _  __| |
-| | | | '_ \ / _ \ '_ \  \___ \ / _ \ '__\ \ / / |/ __/ _ \/ __| | |   | |/ _ \| | | |/ _` |
-| |_| | |_) |  __/ | | |  ___) |  __/ |   \ V /| | (_|  __/\__ \ | |___| | (_) | |_| | (_| |
- \___/| .__/ \___|_| |_| |____/ \___|_|    \_/ |_|\___\___||___/  \____|_|\___/ \__,_|\__,_|
-      |_|
-
-        Open Services Cloud 1.0.0-SNAPSHOT (2023)
-
-Jan 02, 2023 6:26:37 AM org.apache.karaf.minho.boot.service.ServiceRegistry lambda$start$2
-INFO: Starting services
-Jan 02, 2023 6:26:37 AM org.apache.karaf.minho.boot.service.LifeCycleService start
-INFO: Starting lifecycle service
-Jan 02, 2023 6:26:37 AM org.eclipse.jetty.server.Server doStart
-INFO: jetty-11.0.12; built: 2022-09-14T02:38:00.723Z; git: d5b8c29485f5f56a14be5f20c2ccce81b93c5555; jvm 11.0.17+8
-Jan 02, 2023 6:26:37 AM org.eclipse.jetty.server.session.DefaultSessionIdManager doStart
-INFO: Session workerName=node0
-Jan 02, 2023 6:26:37 AM org.glassfish.jersey.server.wadl.WadlFeature configure
-WARNING: JAXBContext implementation could not be found. WADL feature is disabled.
-Jan 02, 2023 6:26:37 AM org.eclipse.jetty.server.handler.ContextHandler doStart
-INFO: Started o.e.j.s.ServletContextHandler@703feacd{/,null,AVAILABLE}
-Jan 02, 2023 6:26:37 AM org.eclipse.jetty.server.AbstractConnector doStart
-INFO: Started ServerConnector@16a0ee18{HTTP/1.1, (http/1.1)}{0.0.0.0:8080}
-Jan 02, 2023 6:26:37 AM org.eclipse.jetty.server.Server doStart
-INFO: Started Server@5032714f{STARTING}[11.0.12,sto=0] @858ms
-Jan 02, 2023 6:26:37 AM org.eclipse.osc.orchestrator.OrchestratorService lambda$onRegister$2
-INFO: Loading OSC orchestrator plugins
 ```
 
 We can now deploy the service exposing the port 8080 of the OSC runtime:
 
 ```shell
 $ kubectl apply -f runtime/src/main/kubernetes/org.eclipse.osc.service.yaml 
-service/osc created
+service/xpanse created
 ```
 
 and check that the port is currently bound on the NodePort:
 
 ```shell
-$ kubectl get services -n osc
+$ kubectl get services -n xpanse
 NAME   TYPE       CLUSTER-IP    EXTERNAL-IP   PORT(S)          AGE
 osc    NodePort   10.97.81.86   <none>        8080:32228/TCP   13s
 ```
@@ -305,7 +196,7 @@ osc    NodePort   10.97.81.86   <none>        8080:32228/TCP   13s
 We can now access the health endpoint of the OSC REST API:
 
 ```shell
-$ minikube service list -n osc
+$ minikube service list -n xpanse
 |-----------|------|-------------|---------------------------|
 | NAMESPACE | NAME | TARGET PORT |            URL            |
 |-----------|------|-------------|---------------------------|
@@ -316,8 +207,8 @@ $ minikube service list -n osc
 You can now point test the health endpoint:
 
 ```shell
-$ curl -XGET http://192.168.49.2:32228/osc/health
+$ curl -XGET http://192.168.49.2:32228/xpanse/health
 ready
 ```
 
-OSC is now ready on your Kubernetes cluster.
+Xpanse is now ready on your Kubernetes cluster.
