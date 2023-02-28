@@ -1,3 +1,9 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: Huawei Inc.
+ *
+ */
+
 package org.eclipse.xpanse.modules.engine.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,19 +18,20 @@ import org.eclipse.xpanse.modules.engine.terraform.exceptions.TFExecutorExceptio
 import org.eclipse.xpanse.modules.engine.terraform.resource.TfState;
 import org.eclipse.xpanse.modules.engine.terraform.resource.TfStateResource;
 import org.eclipse.xpanse.modules.engine.terraform.resource.TfStateResourceInstance;
-import org.eclipse.xpanse.modules.engine.xpresource.*;
+import org.eclipse.xpanse.modules.engine.xpresource.XpResource;
+import org.eclipse.xpanse.modules.engine.xpresource.XpResourceContainer;
+import org.eclipse.xpanse.modules.engine.xpresource.XpResourceKind;
+import org.eclipse.xpanse.modules.engine.xpresource.XpResourceProperty;
+import org.eclipse.xpanse.modules.engine.xpresource.XpResourceVm;
+import org.eclipse.xpanse.modules.engine.xpresource.XpResourceVpc;
 import org.springframework.stereotype.Component;
 
 /**
- * @Description:
- * @ClassName: HuaweiTFHandler
- * @Author: yy
- * @Date: 2023/2/16 17:03
- * @Version: 1.0
+ * Process Huawei cloud resources and return XpanseResource format.
  */
 @Component
 @Slf4j
-public class HuaweiTFHandler implements XpanseHandler {
+public class HuaweiTfHandler implements XpanseHandler {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -45,30 +52,28 @@ public class HuaweiTFHandler implements XpanseHandler {
                     String id = (String) instance.getAttributes().get("id");
                     String name = (String) instance.getAttributes().get("name");
                     String ipv4 = (String) instance.getAttributes().get("access_ip_v4");
-                    String image_id = (String) instance.getAttributes().get("image_id");
-                    String image_name = (String) instance.getAttributes().get("image_name");
-                    String region = (String) instance.getAttributes().get("region");
-
                     XpResourceVm xpResourceVm = new XpResourceVm();
                     xpResourceVm.setId(id);
                     xpResourceVm.setName(name);
                     xpResourceVm.setIpv4(ipv4);
+                    String imageId = (String) instance.getAttributes().get("image_id");
+                    String imageName = (String) instance.getAttributes().get("image_name");
                     XpResourceContainer xpResourceContainer = new XpResourceContainer();
-                    xpResourceContainer.setContainerId(image_id);
-                    xpResourceContainer.setContainerName(image_name);
+                    xpResourceContainer.setContainerId(imageId);
+                    xpResourceContainer.setContainerName(imageName);
                     XpResourceKind xpResourceKind = new XpResourceKind();
                     xpResourceKind.setXpResourceVm(xpResourceVm);
                     xpResourceKind.setXpResourceContainer(xpResourceContainer);
-
-                    xpResource.setXpResourceKind(xpResourceKind);
+                    String region = (String) instance.getAttributes().get("region");
                     xpResource.setRegion(region);
+                    xpResource.setXpResourceKind(xpResourceKind);
                     xpResource.setId(UUID.randomUUID().toString());
                 }
             }
             if (tfStateResource.getType().equals("huaweicloud_compute_eip_associate")) {
                 for (TfStateResourceInstance instance : tfStateResource.getInstances()) {
-                    String public_ip = (String) instance.getAttributes().get("public_ip");
-                    xpResource.setEip(public_ip);
+                    String eip = (String) instance.getAttributes().get("public_ip");
+                    xpResource.setEip(eip);
                 }
             }
             if (tfStateResource.getType().equals("huaweicloud_vpc")) {

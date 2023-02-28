@@ -1,13 +1,15 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: Huawei Inc.
+ *
+ */
+
 package org.eclipse.xpanse.modules.engine.xpresource;
 
 import lombok.Data;
 
 /**
- * @Description:
- * @ClassName: XpResource
- * @Author: yy
- * @Date: 2023/2/17 15:41
- * @Version: 1.0
+ * XpResource class.
  */
 @Data
 public class XpResource {
