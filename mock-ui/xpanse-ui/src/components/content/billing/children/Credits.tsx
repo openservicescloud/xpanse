@@ -11,7 +11,7 @@ import {Input, Space, Table, Tag} from 'antd';
 
 const {Search} = Input;
 
-function Credits(props) {
+function Credits(props : any) {
   const suffix = (
       <AudioOutlined
           style={{
@@ -20,10 +20,10 @@ function Credits(props) {
           }}
       />
   );
-  const onSearch = (value) => console.log(value);
+  const onSearch = (value : any) => console.log(value);
 
   const [current, setCurrent] = useState(3);
-  const onChange = (page) => {
+  const onChange = (page : any) => {
     console.log(page);
     setCurrent(page);
   };

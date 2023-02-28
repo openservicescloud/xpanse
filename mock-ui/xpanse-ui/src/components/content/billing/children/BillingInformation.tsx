@@ -5,9 +5,9 @@ import CreditCard from "./CreditCard";
 
 const {Search} = Input;
 
-function BillingInformation(props) {
+function BillingInformation(props : any):JSX.Element {
 
-  function onClick(number) {
+  function onClick(number : any) {
 
     if (number === 1) {
       <CreditCard/>
@@ -24,10 +24,10 @@ function BillingInformation(props) {
   const handleCancel = () => {
     setIsModalOpen(false);
   };
-  const onChange = (value) => {
+  const onChange = (value : any) => {
     console.log(`selected ${value}`);
   };
-  const onSearch = (value) => {
+  const onSearch = (value : any) => {
     console.log('search:', value);
   };
   const {TextArea} = Input;

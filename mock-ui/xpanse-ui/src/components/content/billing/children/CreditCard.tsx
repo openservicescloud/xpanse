@@ -3,7 +3,7 @@ import {Input, Space} from 'antd';
 
 const {Search} = Input;
 
-function CreditCard(props) {
+function CreditCard(props : any) {
 
   return (
       <>

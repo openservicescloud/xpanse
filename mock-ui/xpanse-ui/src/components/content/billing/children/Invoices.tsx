@@ -4,8 +4,8 @@ import {Input, Space} from 'antd';
 
 const {Search} = Input;
 
-function Invoices(props) {
-  const onSearch = (value) => console.log(value);
+function Invoices(props : any) {
+  const onSearch = (value : any) => console.log(value);
   const columns = [
     {
       title: 'Credit Code',
