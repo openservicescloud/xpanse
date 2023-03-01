@@ -24,6 +24,12 @@ public class Response {
 
     private Object data;
 
+    /**
+     * Constructor.
+     *
+     * @param errCode errCode.
+     * @param message message.
+     */
     public Response(ErrCode errCode, String message) {
         this.code = errCode.getCode();
         this.message = errCode.getErrMsg() + ". -- " + message;
@@ -33,6 +39,12 @@ public class Response {
     public Response() {
     }
 
+    /**
+     * result.
+     *
+     * @param message message.
+     * @return Response response.
+     */
     public static Response successResponse(String message) {
         Response response = new Response();
         response.setSuccess(true);
@@ -41,6 +53,13 @@ public class Response {
         return response;
     }
 
+    /**
+     * result.
+     *
+     * @param message message.
+     * @param data    data.
+     * @return Response response.
+     */
     public static Response resultResponse(String message, Object data) {
         Response response = new Response();
         response.setSuccess(true);
