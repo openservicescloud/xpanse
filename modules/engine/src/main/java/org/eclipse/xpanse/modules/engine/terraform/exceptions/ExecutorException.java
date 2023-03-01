@@ -4,22 +4,22 @@
  *
  */
 
-package org.eclipse.xpanse.orchestrator.plugin.huaweicloud.exceptions;
+package org.eclipse.xpanse.modules.engine.terraform.exceptions;
 
 /**
  * Defines possible exceptions returned by Terraform execution.
  */
-public class TerraformExecutorException extends RuntimeException {
+public class ExecutorException extends RuntimeException {
 
-    public TerraformExecutorException() {
+    public ExecutorException() {
         super("TfExecutor Exception");
     }
 
-    public TerraformExecutorException(String message) {
+    public ExecutorException(String message) {
         super("TfExecutor Exception:" + message);
     }
 
-    public TerraformExecutorException(String message, Throwable ex) {
+    public ExecutorException(String message, Throwable ex) {
         super(message, ex);
     }
 
@@ -30,14 +30,14 @@ public class TerraformExecutorException extends RuntimeException {
      * @param output Output of the command execution.
      * @param ex     Type of the exception thrown.
      */
-    public TerraformExecutorException(String cmd, String output, Throwable ex) {
-        super("TfExecutor Exception:\n"
+    public ExecutorException(String cmd, String output, Throwable ex) {
+        super("Executor Exception:\n"
                         + "\n** Cmd:\n" + cmd + "\n** Output:\n" + output,
                 ex);
     }
 
-    public TerraformExecutorException(String cmd, String output) {
-        super("TfExecutor Exception:\n"
+    public ExecutorException(String cmd, String output) {
+        super("Executor Exception:\n"
                 + "\n** Cmd:\n" + cmd + "\n** Output:\n" + output);
     }
 }

@@ -1,3 +1,9 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: Huawei Inc.
+ *
+ */
+
 package org.eclipse.xpanse.api;
 
 
@@ -22,6 +28,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * xpanse API.
+ */
 @Slf4j
 @RestController
 @RequestMapping("/xpanse/v2")
@@ -81,7 +90,7 @@ public class XpanseDeployApi {
     }
 
     /**
-     * Get service monitor data
+     * Get service monitor data.
      *
      * @return response
      */

@@ -172,7 +172,6 @@ public class XpanseTaskServiceImpl implements XpanseTaskService {
 
     @Override
     public List<Context> listServiceContexts(String serviceName) {
-        List<Context> contexts = new ArrayList<>();
         Context ak = new Context();
         ak.setName("AK");
         ak.setKind("fix");
@@ -182,7 +181,7 @@ public class XpanseTaskServiceImpl implements XpanseTaskService {
         Map<String, String> akValidators = new HashMap<>();
         akValidators.put("LENGTH", "(1,64)");
         ak.setValidators(akValidators);
-        contexts.add(ak);
+
         Context sk = new Context();
         sk.setName("SK");
         sk.setKind("fix");
@@ -192,27 +191,30 @@ public class XpanseTaskServiceImpl implements XpanseTaskService {
         Map<String, String> skValidators = new HashMap<>();
         skValidators.put("LENGTH", "(63,128)");
         sk.setValidators(skValidators);
-        contexts.add(sk);
+
         Context vpc = new Context();
         vpc.setName("VPC");
         vpc.setRequired(false);
         vpc.setKind("variable");
         vpc.setType("String");
         vpc.setDescription("The vpc you want to deploy, If null, A new vpc will be created.");
+
+        List<Context> contexts = new ArrayList<>();
+        contexts.add(ak);
+        contexts.add(sk);
         contexts.add(vpc);
         return contexts;
     }
 
     @Override
     public List<Flavor> listServiceFlavors(String serviceName) {
-        List<Flavor> flavors = new ArrayList<>();
+
         Flavor f1 = new Flavor();
         f1.setName("standalone-kafka");
         f1.setFixedPrice(100);
         Map<String, Object> properties = new HashMap<>();
         properties.put("LENGTH", "(1,64)");
         f1.setProperty(properties);
-        flavors.add(f1);
 
         Flavor f2 = new Flavor();
         f2.setName("3-ecs-kafka");
@@ -220,7 +222,6 @@ public class XpanseTaskServiceImpl implements XpanseTaskService {
         Map<String, Object> properties2 = new HashMap<>();
         properties2.put("LENGTH", "(1,64)");
         f2.setProperty(properties2);
-        flavors.add(f2);
 
         Flavor f3 = new Flavor();
         f3.setName("standalone-kafka");
@@ -228,6 +229,10 @@ public class XpanseTaskServiceImpl implements XpanseTaskService {
         Map<String, Object> properties3 = new HashMap<>();
         properties3.put("LENGTH", "(1,64)");
         f3.setProperty(properties3);
+
+        List<Flavor> flavors = new ArrayList<>();
+        flavors.add(f1);
+        flavors.add(f2);
         flavors.add(f3);
         return flavors;
     }
