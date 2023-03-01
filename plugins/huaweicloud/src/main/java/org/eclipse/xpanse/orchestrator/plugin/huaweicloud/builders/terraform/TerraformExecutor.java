@@ -41,7 +41,7 @@ public class TerraformExecutor {
 
         if (!ws.exists() && !ws.mkdirs()) {
             throw new TerraformExecutorException(
-                    "Create workspace for TFExecutor failed, File path not created: "
+                    "Create workspace for TfExecutor failed, File path not created: "
                             + ws.getAbsolutePath());
         }
 
@@ -80,7 +80,7 @@ public class TerraformExecutor {
                 tfFile.write(script);
             }
         } catch (IOException ex) {
-            throw new TerraformExecutorException("TFExecutor createTFScript failed.", ex);
+            throw new TerraformExecutorException("TfExecutor createTFScript failed.", ex);
         }
     }
 
@@ -133,8 +133,8 @@ public class TerraformExecutor {
     /**
      * Executes terraform destroy command.
      *
-     * @return true if all resources are successfully destroyed on the target infrastructure.
-     * else false.
+     * @return true if all resources are successfully destroyed on the target infrastructure. else
+     * false.
      */
     public boolean tfDestroy() {
         // TODO: Dynamic variables need to be supported.
