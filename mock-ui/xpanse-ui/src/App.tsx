@@ -3,6 +3,7 @@ import React from 'react';
 import {Route, Routes} from 'react-router-dom';
 import './styles/app.css';
 import Home from './components/content/Home';
+import LoginScreen from './components/content/LoginScreen';
 import Protected from './components/content/ProtectedRoute';
 import {homePageRoute} from './components/utils/constants';
 import Services from "./components/content/services/Services";
@@ -11,9 +12,7 @@ import IntegrationEndpoints from "./components/content/integration/IntegrationEn
 import Catalog from "./components/content/catalog/Catalog";
 import MiddleWare from "./components/content/catalog/children/MiddleWare";
 import AI from "./components/content/catalog/children/AI";
-import MediaService from "./components/content/catalog/MediaService/MediaService";
-import LoginScreen from "./components/content/LoginScreen";
-
+import MediaService from "./components/content/catalog/children/MediaService";
 function App() {
   return (
       <Routes>
@@ -29,6 +28,13 @@ function App() {
                element={
                  <Protected>
                    <Services/>
+                 </Protected>
+               }
+        />
+        <Route path={'/billing'}
+               element={
+                 <Protected>
+                   <Billing/>
                  </Protected>
                }
         />
