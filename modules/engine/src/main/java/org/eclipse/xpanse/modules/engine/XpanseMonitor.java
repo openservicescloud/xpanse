@@ -6,7 +6,7 @@
 
 package org.eclipse.xpanse.modules.engine;
 
-import org.eclipse.xpanse.modules.engine.xpresource.XpResource;
+import org.eclipse.xpanse.modules.engine.xpresource.XpanseResource;
 
 /**
  * This interface describes the cpuUsage and memUsage for querying the server.
@@ -19,7 +19,7 @@ public interface XpanseMonitor {
      * @param xpResource the xpanseResource.
      * @param task       the xpanseDeployTask.
      */
-    String cpuUsage(XpResource xpResource, XpanseDeployTask task);
+    String cpuUsage(XpanseResource xpResource, XpanseDeployTask task);
 
     /**
      * Method to git service memUsage.
@@ -27,6 +27,6 @@ public interface XpanseMonitor {
      * @param xpResource the xpanseResource.
      * @param task       the xpanseDeployTask.
      */
-    String memUsage(XpResource xpResource, XpanseDeployTask task);
+    String memUsage(XpanseResource xpResource, XpanseDeployTask task);
 
 }

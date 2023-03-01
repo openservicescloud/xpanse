@@ -6,10 +6,6 @@
 
 package org.eclipse.xpanse.modules.engine.utils;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -17,6 +13,9 @@ import java.io.InputStreamReader;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Executes operating system commands.

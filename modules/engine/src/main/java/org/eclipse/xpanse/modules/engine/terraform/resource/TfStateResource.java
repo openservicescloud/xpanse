@@ -7,9 +7,8 @@
 package org.eclipse.xpanse.modules.engine.terraform.resource;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.Data;
-
 import java.util.List;
+import lombok.Data;
 
 /**
  * TfStateResource class.

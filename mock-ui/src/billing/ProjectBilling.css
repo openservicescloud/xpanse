@@ -1,0 +1,45 @@
+.xpanse-BillingGroupHeader {
+  margin: 10px 0;
+  padding: 10px;
+  width: 1500px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.typography-heading {
+  width: 100px;
+  height: 50px;
+}
+
+.xpanse-BillingGroupHeader-detail-container {
+  width: 100px;
+  height: 50px;
+  text-align: right;
+}
+
+.xpanse-BillingGroupHeader-detail-title {
+  font-size: 12px;
+  line-height: 126%;
+  letter-spacing: .033em;
+  color: #787885;
+  white-space: nowrap;
+  text-align: right;
+}
+
+.xpanse-BillingGroupHeader-detail-balance {
+  color: #333;
+  font-size: 24px;
+  font-weight: 700;
+  white-space: nowrap;
+  text-align: right;
+}
+
+.xpanse-BillingGroupHeader-detail-payment {
+  color: #5a5b6a;
+  letter-spacing: .0275em;
+  font-size: 16px;
+  line-height: 150%;
+  text-align: right;
+  white-space: nowrap;
+  text-align: right;
+}

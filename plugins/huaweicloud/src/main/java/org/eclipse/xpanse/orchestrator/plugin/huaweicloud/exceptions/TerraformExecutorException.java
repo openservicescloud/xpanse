@@ -12,11 +12,11 @@ package org.eclipse.xpanse.orchestrator.plugin.huaweicloud.exceptions;
 public class TerraformExecutorException extends RuntimeException {
 
     public TerraformExecutorException() {
-        super("TFExecutor Exception");
+        super("TfExecutor Exception");
     }
 
     public TerraformExecutorException(String message) {
-        super("TFExecutor Exception:" + message);
+        super("TfExecutor Exception:" + message);
     }
 
     public TerraformExecutorException(String message, Throwable ex) {

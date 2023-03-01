@@ -48,13 +48,13 @@ public class HuaweiResourceBuilder extends AtomBuilder {
         tfExecutor.createTerraformScript();
 
         if (!tfExecutor.tfInit()) {
-            throw new BuilderException(this, "TFExecutor.tfInit failed." + name());
+            throw new BuilderException(this, "TfExecutor.tfInit failed." + name());
         }
         if (!tfExecutor.tfPlan()) {
-            throw new BuilderException(this, "TFExecutor.tfPlan failed." + name());
+            throw new BuilderException(this, "TfExecutor.tfPlan failed." + name());
         }
         if (!tfExecutor.tfApply()) {
-            throw new BuilderException(this, "TFExecutor.tfApply failed." + name());
+            throw new BuilderException(this, "TfExecutor.tfApply failed." + name());
         }
 
         tfExecutor.updateOclResources(ctx.getOclResources());
@@ -73,10 +73,10 @@ public class HuaweiResourceBuilder extends AtomBuilder {
 
         if (!tfExecutor.tfInit()) {
             log.error("ResourceBuilder Init failed {}.", name());
-            throw new BuilderException(this, "TFExecutor.tfInit failed " + name());
+            throw new BuilderException(this, "TfExecutor.tfInit failed " + name());
         }
         if (!tfExecutor.tfPlan()) {
-            throw new BuilderException(this, "TFExecutor.tfPlan failed." + name());
+            throw new BuilderException(this, "TfExecutor.tfPlan failed." + name());
         }
         if (!tfExecutor.tfDestroy()) {
             log.error("ResourceBuilder destroy failed {}.", name());

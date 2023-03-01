@@ -6,25 +6,24 @@
 
 package org.eclipse.xpanse.modules.engine.terraform;
 
-import lombok.extern.slf4j.Slf4j;
-import org.eclipse.xpanse.modules.engine.terraform.exceptions.TFExecutorException;
-import org.eclipse.xpanse.modules.engine.utils.SystemCmd;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
+import org.eclipse.xpanse.modules.engine.terraform.exceptions.ExecutorException;
+import org.eclipse.xpanse.modules.engine.utils.SystemCmd;
 
 /**
  * Class to encapsulate all Terraform executions.
  */
 @Slf4j
-public class TFExecutor {
+public class TfExecutor {
 
     private Map<String, String> env;
     private String workspace;
 
-    public TFExecutor(Map<String, String> env, String workspace) {
+    public TfExecutor(Map<String, String> env, String workspace) {
         this.env = env;
         this.workspace = workspace;
     }
@@ -70,8 +69,8 @@ public class TFExecutor {
     /**
      * Executes terraform destroy command.
      *
-     * @return true if all resources are successfully destroyed on the target infrastructure.
-     * else false.
+     * @return true if all resources are successfully destroyed on the target infrastructure. else
+     * false.
      */
     public boolean tfDestroy() {
         // TODO: Dynamic variables need to be supported.
@@ -90,38 +89,38 @@ public class TFExecutor {
     }
 
     /**
-     * deploy source by terraform
+     * deploy source by terraform.
      */
     public void deploy() {
         if (!tfInit()) {
-            log.error("TFExecutor.tfInit failed.");
-            throw new TFExecutorException("TFExecutor.tfInit failed.");
+            log.error("TfExecutor.tfInit failed.");
+            throw new ExecutorException("TfExecutor.tfInit failed.");
         }
         if (!tfPlan()) {
-            log.error("TFExecutor.tfPlan failed.");
-            throw new TFExecutorException("TFExecutor.tfPlan failed.");
+            log.error("TfExecutor.tfPlan failed.");
+            throw new ExecutorException("TfExecutor.tfPlan failed.");
         }
         if (!tfApply()) {
-            log.error("TFExecutor.tfApply failed.");
-            throw new TFExecutorException("TFExecutor.tfApply failed.");
+            log.error("TfExecutor.tfApply failed.");
+            throw new ExecutorException("TfExecutor.tfApply failed.");
         }
     }
 
     /**
-     * destroy resource
+     * destroy resource.
      */
     public void destroy() {
         if (!tfInit()) {
-            log.error("TFExecutor.tfInit failed.");
-            throw new TFExecutorException("TFExecutor.tfInit failed.");
+            log.error("TfExecutor.tfInit failed.");
+            throw new ExecutorException("TfExecutor.tfInit failed.");
         }
         if (!tfPlan()) {
-            log.error("TFExecutor.tfPlan failed.");
-            throw new TFExecutorException("TFExecutor.tfPlan failed.");
+            log.error("TfExecutor.tfPlan failed.");
+            throw new ExecutorException("TfExecutor.tfPlan failed.");
         }
         if (!tfDestroy()) {
-            log.error("TFExecutor.tfDestroy failed.");
-            throw new TFExecutorException("TFExecutor.tfDestroy failed.");
+            log.error("TfExecutor.tfDestroy failed.");
+            throw new ExecutorException("TfExecutor.tfDestroy failed.");
         }
     }
 
@@ -139,7 +138,7 @@ public class TFExecutor {
         try {
             return Files.readString(tfState.toPath());
         } catch (IOException ex) {
-            throw new TFExecutorException("Read state file failed.", ex);
+            throw new ExecutorException("Read state file failed.", ex);
         }
     }
 }

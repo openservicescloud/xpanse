@@ -1,11 +1,20 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: Huawei Inc.
+ *
+ */
+
 package org.eclipse.xpanse.modules.engine;
 
+import java.util.Map;
 import lombok.Data;
 
-import java.util.Map;
-
+/**
+ * Tasks performed by Terraform engine deployment.
+ */
 @Data
 public class XpanseDeployTask {
+
     private String serviceName;
     private String serviceVersion;
     private String taskId;

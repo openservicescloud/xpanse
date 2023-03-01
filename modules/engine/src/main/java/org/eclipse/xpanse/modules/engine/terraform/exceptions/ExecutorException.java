@@ -9,17 +9,17 @@ package org.eclipse.xpanse.modules.engine.terraform.exceptions;
 /**
  * Defines possible exceptions returned by Terraform execution.
  */
-public class TFExecutorException extends RuntimeException {
+public class ExecutorException extends RuntimeException {
 
-    public TFExecutorException() {
-        super("TFExecutor Exception");
+    public ExecutorException() {
+        super("TfExecutor Exception");
     }
 
-    public TFExecutorException(String message) {
-        super("TFExecutor Exception:" + message);
+    public ExecutorException(String message) {
+        super("TfExecutor Exception:" + message);
     }
 
-    public TFExecutorException(String message, Throwable ex) {
+    public ExecutorException(String message, Throwable ex) {
         super(message, ex);
     }
 
@@ -30,13 +30,13 @@ public class TFExecutorException extends RuntimeException {
      * @param output Output of the command execution.
      * @param ex     Type of the exception thrown.
      */
-    public TFExecutorException(String cmd, String output, Throwable ex) {
+    public ExecutorException(String cmd, String output, Throwable ex) {
         super("Executor Exception:\n"
                         + "\n** Cmd:\n" + cmd + "\n** Output:\n" + output,
                 ex);
     }
 
-    public TFExecutorException(String cmd, String output) {
+    public ExecutorException(String cmd, String output) {
         super("Executor Exception:\n"
                 + "\n** Cmd:\n" + cmd + "\n** Output:\n" + output);
     }

@@ -18,7 +18,7 @@ import org.eclipse.xpanse.modules.engine.XpanseDeployEngine;
 import org.eclipse.xpanse.modules.engine.XpanseDeployResponse;
 import org.eclipse.xpanse.modules.engine.XpanseDeployTask;
 import org.eclipse.xpanse.modules.engine.XpanseMonitor;
-import org.eclipse.xpanse.modules.engine.xpresource.XpResource;
+import org.eclipse.xpanse.modules.engine.xpresource.XpanseResource;
 import org.eclipse.xpanse.modules.ocl.loader.data.models.enums.ServiceState;
 import org.eclipse.xpanse.modules.ocl.v2.Context;
 import org.eclipse.xpanse.modules.ocl.v2.Deployment;
@@ -235,13 +235,14 @@ public class XpanseTaskServiceImpl implements XpanseTaskService {
     @Override
     public String showMonitorData(String vmId) {
         List<ServiceTaskEntity> tasks = listServiceTasks();
-        for (ServiceTaskEntity serviceTaskEntity:tasks){
+        for (ServiceTaskEntity serviceTaskEntity : tasks) {
             XpanseDeployTask task = serviceTaskEntity.getXpanseDeployResponse().getTask();
-            List<XpResource> xpResources =
-                serviceTaskEntity.getXpanseDeployResponse().getResources();
-            for (XpResource xpResource:xpResources){
-                if (vmId.equals(xpResource.getXpResourceKind().getXpResourceVm().getId())){
-                    return xpanseMonitor.cpuUsage(xpResource, task)+xpanseMonitor.memUsage(xpResource, task);
+            List<XpanseResource> xpanseResources =
+                    serviceTaskEntity.getXpanseDeployResponse().getResources();
+            for (XpanseResource xpanseResource : xpanseResources) {
+                if (vmId.equals(xpanseResource.getXpResourceKind().getXpResourceVm().getId())) {
+                    return xpanseMonitor.cpuUsage(xpanseResource, task) + xpanseMonitor.memUsage(
+                            xpanseResource, task);
                 }
             }
         }

@@ -20,21 +20,17 @@ import org.eclipse.xpanse.modules.engine.XpanseDeployTask;
 import org.eclipse.xpanse.modules.engine.XpanseMonitor;
 import org.eclipse.xpanse.modules.engine.monitor.resource.MonitorResource;
 import org.eclipse.xpanse.modules.engine.monitor.resource.MonitorResourceHandler;
-import org.eclipse.xpanse.modules.engine.xpresource.XpResource;
+import org.eclipse.xpanse.modules.engine.xpresource.XpanseResource;
 import org.springframework.stereotype.Component;
 
 /**
- * @Description: Plugin to git monitor data on Huawei cloud.
- * @ClassName: HuaweiMonitor
- * @Author:
- * @Date: 2023/2/20 16:02
- * @Version: 1.0
+ * Plugin to git monitor data on Huawei cloud.
  */
 @Component
 public class HuaweiMonitor implements XpanseMonitor {
 
     @Override
-    public String cpuUsage(XpResource xpResource, XpanseDeployTask task) {
+    public String cpuUsage(XpanseResource xpanseResource, XpanseDeployTask task) {
 
         String ak = task.getContext().get("AK");
         String sk = task.getContext().get("SK");
@@ -43,7 +39,7 @@ public class HuaweiMonitor implements XpanseMonitor {
                 .withAk(ak)
                 .withSk(sk);
         MonitorResourceHandler monitorResourceHandler = new MonitorResourceHandler();
-        MonitorResource monitorResource = monitorResourceHandler.handler(xpResource);
+        MonitorResource monitorResource = monitorResourceHandler.handler(xpanseResource);
         CesClient client = CesClient.newBuilder()
                 .withCredential(auth)
                 .withRegion(CesRegion.valueOf(monitorResource.getRegion()))
@@ -74,7 +70,7 @@ public class HuaweiMonitor implements XpanseMonitor {
     }
 
     @Override
-    public String memUsage(XpResource xpResource, XpanseDeployTask task) {
+    public String memUsage(XpanseResource xpanseResource, XpanseDeployTask task) {
 
         String ak = task.getContext().get("AK");
         String sk = task.getContext().get("SK");
@@ -83,7 +79,7 @@ public class HuaweiMonitor implements XpanseMonitor {
                 .withAk(ak)
                 .withSk(sk);
         MonitorResourceHandler monitorResourceHandler = new MonitorResourceHandler();
-        MonitorResource monitorResource = monitorResourceHandler.handler(xpResource);
+        MonitorResource monitorResource = monitorResourceHandler.handler(xpanseResource);
         CesClient client = CesClient.newBuilder()
                 .withCredential(auth)
                 .withRegion(CesRegion.valueOf(monitorResource.getRegion()))
