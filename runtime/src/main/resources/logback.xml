@@ -5,17 +5,54 @@
   -->
 
 <configuration>
-    <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
+  <!--日志输出路径: log.path 在application.properties中配置-->
+  <springProperty scope="context" name="log.path" source="log.path"/>
+  <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <Pattern>
+        %d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n
+      </Pattern>
+    </encoder>
+  </appender>
+
+  <appender name="SIFT_HTTP_FILE" class="ch.qos.logback.classic.sift.SiftingAppender">
+    <discriminator>
+      <key>requestId</key>
+      <defaultValue>default</defaultValue>
+    </discriminator>
+    <sift>
+      <appender name="${requestId}" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- 正在记录的日志文档的路径及文档名 -->
+        <file>${log.path}/${requestId}.log</file>
+
+        <!-- 日志记录器的滚动策略，按日期，按大小记录 -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+          <!-- 每天日志归档路径以及格式 -->
+          <fileNamePattern>${log.path}/${requestId}-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+          <timeBasedFileNamingAndTriggeringPolicy
+            class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+            <maxFileSize>10MB</maxFileSize>
+          </timeBasedFileNamingAndTriggeringPolicy>
+          <!--日志文档保留天数-->
+          <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <!--日志文档输出格式-->
         <encoder>
-            <Pattern>
-                %d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n
-            </Pattern>
+          <pattern>
+            %d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} %X{SERVICE_ID} - %msg%n
+          </pattern>
         </encoder>
-    </appender>
-    <logger name="org.eclipse.xpanse" level="info" additivity="false">
-        <appender-ref ref="Console"/>
-    </logger>
-    <root level="error">
-        <appender-ref ref="Console"/>
-    </root>
+      </appender>
+    </sift>
+  </appender>
+
+  <logger name="org.eclipse.xpanse" level="info" additivity="false">
+    <appender-ref ref="Console"/>
+    <appender-ref ref="SIFT_HTTP_FILE"/>
+  </logger>
+
+  <root level="info">
+    <appender-ref ref="Console"/>
+    <appender-ref ref="SIFT_HTTP_FILE"/>
+  </root>
 </configuration>
