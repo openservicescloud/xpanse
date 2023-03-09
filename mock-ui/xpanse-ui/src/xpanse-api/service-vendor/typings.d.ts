@@ -28,6 +28,10 @@ declare namespace ServiceVendor {
     discount?: string;
     official?: string;
   }
+  interface CategoryList {
+    data: [];
+  }
 }
+
 
 
