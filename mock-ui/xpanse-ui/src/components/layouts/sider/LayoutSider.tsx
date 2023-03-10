@@ -18,16 +18,18 @@ function LayoutSider(): JSX.Element {
     }, {
       key: "/integration-endpoints",
       label: "IntegrationEndpoints",
-    },{
-      key: "sub3",
-      label: "subnav 3",
-      children: [
-        {key: 9, label: "option9"},
-        {key: 10, label: "option10"},
-        {key: 11, label: "option11"},
-        {key: 12, label: "option12"}
-      ]
-    },{
+    },
+    //   {
+    //   key: "sub3",
+    //   label: "subnav 3",
+    //   children: [
+    //     {key: 9, label: "option9"},
+    //     {key: 10, label: "option10"},
+    //     {key: 11, label: "option11"},
+    //     {key: 12, label: "option12"}
+    //   ]
+    // },
+      {
       key: "/catalog",
       label: "Catalog",
       children: [
