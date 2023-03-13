@@ -22,7 +22,9 @@ import org.eclipse.xpanse.modules.deployment.Deployment;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.DeployTask;
 import org.eclipse.xpanse.modules.models.enums.DeployerKind;
 import org.eclipse.xpanse.modules.models.enums.ServiceState;
+import org.eclipse.xpanse.modules.models.resource.DeployVariable;
 import org.eclipse.xpanse.modules.models.service.DeployResult;
+import org.eclipse.xpanse.modules.models.utils.DeployVariableValidator;
 import org.eclipse.xpanse.modules.models.view.ServiceVo;
 import org.eclipse.xpanse.orchestrator.register.RegisterServiceStorage;
 import org.eclipse.xpanse.orchestrator.service.DeployServiceStorage;
@@ -53,18 +55,13 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
 
     private final DeployServiceStorage deployServiceStorage;
 
+    private final DeployVariableValidator deployVariableLoader;
+
     @Getter
     private final List<Deployment> deployers = new ArrayList<>();
 
     @Getter
     private final List<OrchestratorPlugin> plugins = new ArrayList<>();
-
-    @Autowired
-    OrchestratorService(RegisterServiceStorage registerServiceStorage,
-            DeployServiceStorage deployServiceStorage) {
-        this.registerServiceStorage = registerServiceStorage;
-        this.deployServiceStorage = deployServiceStorage;
-    }
 
     @Override
     public void onApplicationEvent(ApplicationEvent event) {
@@ -102,34 +99,6 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
     }
 
     /**
-     * Get deployment and fill deployTask for deploy service task.
-     *
-     * @param deployTask the task of deploy managed service name.
-     */
-    public Deployment getDeployHandler(DeployTask deployTask) {
-
-        // Find the registered service and fill Ocl.
-        RegisterServiceEntity serviceEntity = new RegisterServiceEntity();
-        serviceEntity.setName(StringUtils.lowerCase(deployTask.getCreateRequest().getName()));
-        serviceEntity.setVersion(StringUtils.lowerCase(deployTask.getCreateRequest().getVersion()));
-        serviceEntity.setCsp(deployTask.getCreateRequest().getCsp());
-        serviceEntity.setCategory(deployTask.getCreateRequest().getCategory());
-        serviceEntity = registerServiceStorage.findRegisteredService(serviceEntity);
-        if (Objects.isNull(serviceEntity) || Objects.isNull(serviceEntity.getOcl())) {
-            throw new RuntimeException("Registered service not found");
-        }
-        // Set Ocl and CreateRequest
-        deployTask.setOcl(serviceEntity.getOcl());
-        deployTask.getCreateRequest().setOcl(serviceEntity.getOcl());
-        // Check context validation
-        checkContextValidation(deployTask);
-        // Fill the handler
-        fillHandler(deployTask);
-        // get the deployment.
-        return getDeployment(deployTask);
-    }
-
-    /**
      * Async method to deploy service.
      *
      * @param deployment deployment
@@ -155,36 +124,13 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
 
     }
 
-    /**
-     * Get deployment and fill deployTask for destroy service task.
-     *
-     * @param deployTask the task of deploy managed service name.
-     */
-    public Deployment getDestroyHandler(DeployTask deployTask) {
-        // Find the deployed service.
-        DeployServiceEntity deployServiceEntity =
-                deployServiceStorage.findDeployServiceById(deployTask.getId());
-        if (Objects.isNull(deployServiceEntity) || Objects.isNull(
-                deployServiceEntity.getCreateRequest())) {
-            throw new RuntimeException(String.format("Deployed service with id %s not found",
-                    deployTask.getId()));
-        }
-        // Get state of service.
-        ServiceState state = deployServiceEntity.getServiceState();
-        if (state.equals(ServiceState.DEPLOYING) || state.equals(ServiceState.DESTROYING)) {
-            throw new RuntimeException(String.format("Service with id %s is %s.",
-                    deployTask.getId(), state));
-        }
-        // Set Ocl and CreateRequest
-        deployTask.setCreateRequest(deployServiceEntity.getCreateRequest());
-        deployTask.setOcl(deployServiceEntity.getCreateRequest().getOcl());
-        // Check context validation
-        checkContextValidation(deployTask);
-        // Fill the handler
-        fillHandler(deployTask);
-        // get the deployment.
-        return getDeployment(deployTask);
-
+    @Autowired
+    OrchestratorService(RegisterServiceStorage registerServiceStorage,
+            DeployServiceStorage deployServiceStorage,
+            DeployVariableValidator deployVariableLoader) {
+        this.registerServiceStorage = registerServiceStorage;
+        this.deployServiceStorage = deployServiceStorage;
+        this.deployVariableLoader = deployVariableLoader;
     }
 
     /**
@@ -272,8 +218,87 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
         return deploymentOptional.get();
     }
 
-    private void checkContextValidation(DeployTask deployTask) {
-        // TODO check validation between ocl deployment context and createQuest property.
+    /**
+     * Get deployment and fill deployTask for deploy service task.
+     *
+     * @param deployTask the task of deploy managed service name.
+     */
+    public Deployment getDeployHandler(DeployTask deployTask) {
+
+        // Find the registered service and fill Ocl.
+        RegisterServiceEntity serviceEntity = new RegisterServiceEntity();
+        serviceEntity.setName(StringUtils.lowerCase(deployTask.getCreateRequest().getName()));
+        serviceEntity.setVersion(StringUtils.lowerCase(deployTask.getCreateRequest().getVersion()));
+        serviceEntity.setCsp(deployTask.getCreateRequest().getCsp());
+        serviceEntity.setCategory(deployTask.getCreateRequest().getCategory());
+        serviceEntity = registerServiceStorage.findRegisteredService(serviceEntity);
+        if (Objects.isNull(serviceEntity) || Objects.isNull(serviceEntity.getOcl())) {
+            throw new RuntimeException("Registered service not found");
+        }
+
+        // Check context validation
+        if (Objects.nonNull(serviceEntity.getOcl().getDeployment()) && Objects.nonNull(
+                deployTask.getCreateRequest().getProperty())) {
+            List<DeployVariable> deployVariables = serviceEntity.getOcl().getDeployment()
+                    .getContext();
+            deployVariableLoader.checkVariableValidation(deployVariables,
+                    deployTask.getCreateRequest().getProperty());
+        }
+
+        // Set Ocl and CreateRequest
+        deployTask.setOcl(serviceEntity.getOcl());
+        deployTask.getCreateRequest().setOcl(serviceEntity.getOcl());
+        // Fill the handler
+        fillHandler(deployTask);
+        // get the deployment.
+        return getDeployment(deployTask);
+    }
+
+
+    /**
+     * generate OpenApi for registered service using the ID.
+     *
+     * @param id ID of registered service.
+     * @return path of openapi.html
+     */
+    public String getOpenApiUrl(String id) {
+        UUID uuid = UUID.fromString(id);
+        RegisterServiceEntity registerService = registerServiceStorage.getRegisterServiceById(uuid);
+        if (Objects.isNull(registerService) || Objects.isNull(registerService.getOcl())) {
+            throw new IllegalArgumentException(String.format("Registered service with id %s not "
+                    + "existed.", id));
+        }
+        return null;
+    }
+
+    /**
+     * Get deployment and fill deployTask for destroy service task.
+     *
+     * @param deployTask the task of deploy managed service name.
+     */
+    public Deployment getDestroyHandler(DeployTask deployTask) {
+        // Find the deployed service.
+        DeployServiceEntity deployServiceEntity =
+                deployServiceStorage.findDeployServiceById(deployTask.getId());
+        if (Objects.isNull(deployServiceEntity)
+                || Objects.isNull(deployServiceEntity.getCreateRequest())) {
+            throw new RuntimeException(String.format("Deployed service with id %s not found",
+                    deployTask.getId()));
+        }
+        // Get state of service.
+        ServiceState state = deployServiceEntity.getServiceState();
+        if (state.equals(ServiceState.DEPLOYING) || state.equals(ServiceState.DESTROYING)) {
+            throw new RuntimeException(String.format("Service with id %s is %s.",
+                    deployTask.getId(), state));
+        }
+        // Set Ocl and CreateRequest
+        deployTask.setCreateRequest(deployServiceEntity.getCreateRequest());
+        deployTask.setOcl(deployServiceEntity.getCreateRequest().getOcl());
+        // Fill the handler
+        fillHandler(deployTask);
+        // get the deployment.
+        return getDeployment(deployTask);
+
     }
 
 }
