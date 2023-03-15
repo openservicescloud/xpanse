@@ -1,54 +1,59 @@
-import React from 'react';
-import {Space, Tree} from 'antd';
+import React, {useState} from 'react';
+import {Col, Row, Space, Tree} from 'antd';
 import {DataNode, TreeProps} from "antd/es/tree";
-import Icon, {CloudOutlined, MessageOutlined, NodeIndexOutlined} from "@ant-design/icons";
-import {ReactComponent as RancherSvg} from "./img/rancher_icon.svg";
-import {ReactComponent as ActivemqSvg} from './img/activemq_icon.svg';
-import axios from "axios";
+import MiddlerWareTabs from "./MiddlerWareTabs";
+import {
+  SystemStatus
+} from "../../../../xpanse-api/generated";
+import {serviceVendorApi} from "../../../../xpanse-api/xpanseRestApiClient";
+import { ServiceStatusServiceStateEnum } from '../../../../xpanse-api/generated/models/ServiceStatus';
 
 
 function MiddleWare(): JSX.Element {
+  const [serviceState, setServiceState] = useState<ServiceStatusServiceStateEnum>('starting')
+  const [serviceName, setServiceName] = useState<string>()
+  const [serviceVersion, setServiceVersion] = useState<string>()
+  const [serviceData, setServiceData] = useState([]);
+
+  serviceVendorApi
+  .listRegisteredServices()
+  .then((response)=>{
+  })
+  .catch((error: any) =>{
+    console.error(error);
+  })
+
   const treeData: DataNode[] = [
     {
-      title: <Space><CloudOutlined/>Compute</Space>,
-      key: 'compute',
-      selectable: false,
-      checkable: false,
-      children: [
-        {title: <Space><MessageOutlined/>Kubernetes</Space>, key: 'kubernetes',},
-        {title: <Space><Icon component={RancherSvg}/>Rancher</Space>, key: 'rancher'}
-      ],
-    },
-    {
-      title: <Space><NodeIndexOutlined/>Integration</Space>,
-      key: 'integration',
-      selectable: false,
-      checkable: false,
-      children: [
-        {title: <Space><Icon component={ActivemqSvg}/>ActiveMQ</Space>, key: 'activemq'}
-      ]
-    },
-    {
-      title: 'parent 1-0',
-      key: '0-0-0',
-      disabled: true,
+      title: serviceName,
+      key: '0-0',
       children: [
         {
-          title: 'leaf',
-          key: '0-0-0-0',
-          disableCheckbox: true,
+          title: '3.4.0',
+          key: '0-0-0',
+          disabled: false,
         },
         {
-          title: 'leaf',
-          key: '0-0-0-1',
+          title: '3.4.3',
+          key: '0-0-1',
         },
       ],
     },
     {
-      title: 'parent 1-1',
-      key: '0-0-1',
-      children: [{title: <span style={{color: '#1890ff'}}>sss</span>, key: '0-0-1-0'}],
-    },
+      title: 'ActiveMQ',
+      key: '0-1',
+      children: [
+        {
+          title: '5.6.1',
+          key: '0-1-0',
+          disabled: false,
+        },
+        {
+          title: '5.6.5',
+          key: '0-1-1',
+        },
+      ],
+    }
   ];
 
   const onSelect: TreeProps['onSelect'] = (selectedKeys, info) => {
@@ -59,23 +64,25 @@ function MiddleWare(): JSX.Element {
     console.log('onCheck', checkedKeys, info);
   };
 
-  const a  = () =>{
-    axios.get('http://localhost:3000/xpanse/').then(
-
-    )
-  }
 
   return (
       <>
-        <Tree
-            checkable
-            defaultExpandedKeys={['0-0-0', '0-0-1']}
-            defaultSelectedKeys={['0-0-0', '0-0-1']}
-            defaultCheckedKeys={['0-0-0', '0-0-1']}
-            onSelect={onSelect}
-            onCheck={onCheck}
-            treeData={treeData}
-        />
+        <Row  gutter={24}>
+          <Col span={8}>
+              <Tree
+                  checkable
+                  defaultExpandedKeys={['0-0', '0-1']}
+                  defaultSelectedKeys={['0-0', '0-1']}
+                  defaultCheckedKeys={['0-0', '0-1']}
+                  onSelect={onSelect}
+                  onCheck={onCheck}
+                  treeData={treeData}
+              />
+          </Col>
+          <Col span={16}>
+            <MiddlerWareTabs />
+          </Col>
+        </Row>
       </>
   );
 }

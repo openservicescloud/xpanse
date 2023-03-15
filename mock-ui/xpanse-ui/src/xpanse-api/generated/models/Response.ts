@@ -16,56 +16,45 @@
  */
 
 export class Response {
-  /**
-   * The result code of response.
-   */
-  'code': string;
-  /**
-   * The result message of response.
-   */
-  'message': string;
-  /**
-   * The success boolean of response.
-   */
-  'success': boolean;
-  /**
-   * The result data of response.
-   */
-  'data'?: any;
+    /**
+     * The result code of response.
+     */
+    'code': string;
+    /**
+     * The result message of response.
+     */
+    'message': string;
+    /**
+     * The success boolean of response.
+     */
+    'success': boolean;
 
-  static readonly discriminator: string | undefined = undefined;
+    static readonly discriminator: string | undefined = undefined;
 
-  static readonly attributeTypeMap: Array<{ name: string, baseName: string, type: string, format: string }> = [
-    {
-      'name': 'code',
-      'baseName': 'code',
-      'type': 'string',
-      'format': ''
-    },
-    {
-      'name': 'message',
-      'baseName': 'message',
-      'type': 'string',
-      'format': ''
-    },
-    {
-      'name': 'success',
-      'baseName': 'success',
-      'type': 'boolean',
-      'format': ''
-    },
-    {
-      'name': 'data',
-      'baseName': 'data',
-      'type': 'any',
-      'format': ''
-    }];
+    static readonly attributeTypeMap: Array<{ name: string; baseName: string; type: string; format: string }> = [
+        {
+            name: 'code',
+            baseName: 'code',
+            type: 'string',
+            format: '',
+        },
+        {
+            name: 'message',
+            baseName: 'message',
+            type: 'string',
+            format: '',
+        },
+        {
+            name: 'success',
+            baseName: 'success',
+            type: 'boolean',
+            format: '',
+        },
+    ];
 
-  static getAttributeTypeMap() {
-    return Response.attributeTypeMap;
-  }
+    static getAttributeTypeMap() {
+        return Response.attributeTypeMap;
+    }
 
-  public constructor() {
-  }
+    public constructor() {}
 }
-
