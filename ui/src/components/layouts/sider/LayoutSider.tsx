@@ -3,7 +3,7 @@
  * SPDX-FileCopyrightText: Huawei Inc.
  */
 
-import { Image, Menu, Layout } from 'antd';
+import { Image, Layout, Menu } from 'antd';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { homePageRoute, usernameKey } from '../../utils/constants';
@@ -11,6 +11,7 @@ import registerPanelMenu from '../../content/register/registerPanelMenu';
 import { ItemType } from 'antd/es/menu/hooks/useItems';
 import { serviceVendorApi } from '../../../xpanse-api/xpanseRestApiClient';
 import { catalogMenu } from '../../content/catalog/services/catalogMenu';
+import { servicesMenu } from '../../content/order/ServicesMenu';
 
 function LayoutSider(): JSX.Element {
     const [collapsed, setCollapsed] = useState(false);
@@ -22,12 +23,27 @@ function LayoutSider(): JSX.Element {
     };
 
     useEffect(() => {
-        serviceVendorApi.listCategories().then((rsp) => {
-            if (localStorage.getItem(usernameKey) === 'csp') {
-                const data = rsp;
-                setItems([catalogMenu(data), registerPanelMenu()]);
-            }
-        });
+        if (localStorage.getItem(usernameKey) === 'csp') {
+            serviceVendorApi
+                .listCategories()
+                .then((rsp) => {
+                    setItems([catalogMenu(rsp), registerPanelMenu()]);
+                })
+                .catch((error) => {
+                    console.log(error.message);
+                    setItems([catalogMenu([]), registerPanelMenu()]);
+                });
+        } else {
+            serviceVendorApi
+                .listCategories()
+                .then((rsp) => {
+                    setItems([servicesMenu(rsp)]);
+                })
+                .catch((error) => {
+                    console.log(error.message);
+                    setItems([]);
+                });
+        }
     }, []);
 
     return (
