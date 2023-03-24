@@ -1,16 +1,20 @@
-import { Configuration } from '../configuration'
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ * SPDX-FileCopyrightText: Huawei Inc.
+ */
+
+import { Configuration } from '../configuration';
 
 /**
  *
  * @export
  */
 export const COLLECTION_FORMATS = {
-    csv: ",",
-    ssv: " ",
-    tsv: "\t",
-    pipes: "|",
+    csv: ',',
+    ssv: ' ',
+    tsv: '\t',
+    pipes: '|',
 };
-
 
 /**
  *
@@ -18,10 +22,8 @@ export const COLLECTION_FORMATS = {
  * @class BaseAPI
  */
 export class BaseAPIRequestFactory {
-
-    constructor(protected configuration: Configuration) {
-    }
-};
+    constructor(protected configuration: Configuration) {}
+}
 
 /**
  *
@@ -30,8 +32,8 @@ export class BaseAPIRequestFactory {
  * @extends {Error}
  */
 export class RequiredError extends Error {
-    name: "RequiredError" = "RequiredError";
+    name: 'RequiredError' = 'RequiredError';
     constructor(public api: string, public method: string, public field: string) {
-        super("Required parameter " + field + " was null or undefined when calling " + api + "." + method + ".");
+        super('Required parameter ' + field + ' was null or undefined when calling ' + api + '.' + method + '.');
     }
 }
