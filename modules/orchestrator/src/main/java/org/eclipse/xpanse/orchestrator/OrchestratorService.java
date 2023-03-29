@@ -6,38 +6,47 @@
 
 package org.eclipse.xpanse.orchestrator;
 
+import jakarta.annotation.Resource;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.xpanse.modules.billing.BillingService;
 import org.eclipse.xpanse.modules.database.register.RegisterServiceEntity;
 import org.eclipse.xpanse.modules.database.service.DeployResourceEntity;
 import org.eclipse.xpanse.modules.database.service.DeployServiceEntity;
+import org.eclipse.xpanse.modules.database.utils.EntityTransUtils;
 import org.eclipse.xpanse.modules.deployment.Deployment;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.DeployTask;
+import org.eclipse.xpanse.modules.models.enums.Csp;
 import org.eclipse.xpanse.modules.models.enums.DeployerKind;
 import org.eclipse.xpanse.modules.models.enums.ServiceState;
 import org.eclipse.xpanse.modules.models.resource.DeployVariable;
+import org.eclipse.xpanse.modules.models.service.BillingDataResponse;
 import org.eclipse.xpanse.modules.models.service.DeployResource;
 import org.eclipse.xpanse.modules.models.service.DeployResult;
+import org.eclipse.xpanse.modules.models.service.MonitorDataResponse;
+import org.eclipse.xpanse.modules.models.service.MonitorResource;
 import org.eclipse.xpanse.modules.models.utils.DeployVariableValidator;
+import org.eclipse.xpanse.modules.models.view.ServiceDetailVo;
 import org.eclipse.xpanse.modules.models.view.ServiceVo;
+import org.eclipse.xpanse.modules.monitor.Monitor;
 import org.eclipse.xpanse.orchestrator.register.RegisterServiceStorage;
 import org.eclipse.xpanse.orchestrator.service.DeployResourceStorage;
 import org.eclipse.xpanse.orchestrator.service.DeployServiceStorage;
+import org.eclipse.xpanse.orchestrator.utils.OpenApiUtil;
 import org.slf4j.MDC;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationEvent;
-import org.springframework.context.ApplicationListener;
-import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,54 +57,83 @@ import org.springframework.util.CollectionUtils;
  * managed service in the respective infrastructure as defined in the OCL.
  */
 @Slf4j
-@Transactional
 @Component
-public class OrchestratorService implements ApplicationListener<ApplicationEvent> {
-
+public class OrchestratorService {
 
     private static final String TASK_ID = "TASK_ID";
 
-    private final RegisterServiceStorage registerServiceStorage;
+    private final Map<Csp, OrchestratorPlugin> pluginMap = new ConcurrentHashMap<>();
 
-    private final DeployServiceStorage deployServiceStorage;
+    private final Map<DeployerKind, Deployment> deploymentMap = new ConcurrentHashMap<>();
 
-    private final DeployResourceStorage deployResourceStorage;
+    private final Map<Csp, Monitor> monitorServiceMap = new ConcurrentHashMap<>();
 
-    private final DeployVariableValidator deployVariableValidator;
+    private final Map<Csp, BillingService> billingServiceMap = new ConcurrentHashMap<>();
 
-    @Getter
-    private final List<Deployment> deployers = new ArrayList<>();
+    @Resource
+    private ApplicationContext applicationContext;
+    @Resource
+    private RegisterServiceStorage registerServiceStorage;
+    @Resource
+    private DeployServiceStorage deployServiceStorage;
+    @Resource
+    private DeployResourceStorage deployResourceStorage;
+    @Resource
+    private DeployVariableValidator deployVariableValidator;
+    @Resource
+    private OpenApiUtil openApiUtil;
 
-    @Getter
-    private final List<OrchestratorPlugin> plugins = new ArrayList<>();
+    @Value("${monitor.data.agent.enable}")
+    private Boolean monitorAgentEnabled;
 
-    @Autowired
-    OrchestratorService(RegisterServiceStorage registerServiceStorage,
-            DeployServiceStorage deployServiceStorage,
-            DeployResourceStorage deployResourceStorage,
-            DeployVariableValidator variableValidator) {
-        this.registerServiceStorage = registerServiceStorage;
-        this.deployServiceStorage = deployServiceStorage;
-        this.deployResourceStorage = deployResourceStorage;
-        this.deployVariableValidator = variableValidator;
+    /**
+     * Get all OrchestratorPlugin implements group by Csp.
+     *
+     * @return pluginMap
+     */
+    @Bean
+    public Map<Csp, OrchestratorPlugin> pluginMap() {
+        applicationContext.getBeansOfType(OrchestratorPlugin.class)
+                .forEach((key, value) -> pluginMap.put(value.getCsp(), value));
+        return pluginMap;
     }
 
-    @Override
-    public void onApplicationEvent(ApplicationEvent event) {
-        if (event instanceof ContextRefreshedEvent) {
-            ApplicationContext applicationContext =
-                    ((ContextRefreshedEvent) event).getApplicationContext();
-            plugins.addAll(applicationContext.getBeansOfType(OrchestratorPlugin.class).values());
-            if (plugins.isEmpty()) {
-                log.warn("No xpanse plugins loaded by the runtime.");
-            }
-
-            deployers.addAll(applicationContext.getBeansOfType(Deployment.class).values());
-            if (deployers.isEmpty()) {
-                log.warn("No deployer loaded by the runtime.");
-            }
-        }
+    /**
+     * Get all Deployment implements group by DeployerKind.
+     *
+     * @return deployerMap
+     */
+    @Bean
+    public Map<DeployerKind, Deployment> deploymentMap() {
+        applicationContext.getBeansOfType(Deployment.class)
+                .forEach((key, value) -> deploymentMap.put(value.getDeployerKind(), value));
+        return deploymentMap;
     }
+
+    /**
+     * Get all Monitor implements group by Csp.
+     *
+     * @return monitorMap
+     */
+    @Bean
+    public Map<Csp, Monitor> monitorMap() {
+        applicationContext.getBeansOfType(Monitor.class)
+                .forEach((key, value) -> monitorServiceMap.put(value.getCsp(), value));
+        return monitorServiceMap;
+    }
+
+    /**
+     * Get all BillingService implements group by Csp.
+     *
+     * @return monitorMap
+     */
+    @Bean
+    public Map<Csp, BillingService> billingServiceMap() {
+        applicationContext.getBeansOfType(BillingService.class)
+                .forEach((key, value) -> billingServiceMap.put(value.getCsp(), value));
+        return billingServiceMap;
+    }
+
 
     /**
      * Persist the result of the deployment.
@@ -150,6 +188,62 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
     }
 
     /**
+     * Method to monitor service.
+     *
+     * @param id Deploy service UUID.
+     */
+    public MonitorResource monitor(UUID id, String fromTime, String toTime) {
+        // Find the deployed service.
+        DeployServiceEntity deployServiceEntity =
+                deployServiceStorage.findDeployServiceById(id);
+        if (Objects.isNull(deployServiceEntity) || Objects.isNull(
+                deployServiceEntity.getCreateRequest()) || Objects.isNull(
+                deployServiceEntity.getDeployResourceList())) {
+            throw new RuntimeException(String.format("Deployed service with id %s not found",
+                    id));
+        }
+        Csp csp = deployServiceEntity.getCreateRequest().getCsp();
+        Monitor monitor = monitorServiceMap.get(csp);
+        if (Objects.isNull(monitor)) {
+            throw new RuntimeException("Can't find suitable monitor for the Task.");
+        }
+        MonitorResource monitorResource = new MonitorResource();
+        List<MonitorDataResponse> cpu = monitor.cpuUsage(deployServiceEntity, monitorAgentEnabled,
+                fromTime, toTime);
+        List<MonitorDataResponse> mem = monitor.memUsage(deployServiceEntity, monitorAgentEnabled,
+                fromTime, toTime);
+        monitorResource.setCpu(cpu);
+        monitorResource.setMem(mem);
+        return monitorResource;
+
+    }
+
+    /**
+     * Method to get service billing.
+     *
+     * @param id Deploy service UUID.
+     */
+    public List<BillingDataResponse> billing(UUID id, Boolean unit) {
+        // Find the deployed service.
+        DeployServiceEntity deployServiceEntity =
+                deployServiceStorage.findDeployServiceById(id);
+        if (Objects.isNull(deployServiceEntity) || Objects.isNull(
+                deployServiceEntity.getCreateRequest()) || Objects.isNull(
+                deployServiceEntity.getDeployResourceList())) {
+            throw new RuntimeException(String.format("Deployed service with id %s not found",
+                    id));
+        }
+        Csp csp = deployServiceEntity.getCreateRequest().getCsp();
+
+        BillingService billing = billingServiceMap.get(csp);
+        if (Objects.isNull(billing)) {
+            throw new RuntimeException("Can't find suitable billing for the Task.");
+        }
+        return billing.onDemandBilling(deployServiceEntity, unit);
+
+    }
+
+    /**
      * Async method to deploy service.
      *
      * @param deployment deployment
@@ -165,7 +259,8 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
             deployServiceStorage.store(deployServiceEntity);
             DeployResult deployResult = deployment.deploy(deployTask);
             deployServiceEntity.setServiceState(ServiceState.DEPLOY_SUCCESS);
-            deployServiceEntity.setDeployResourceEntity(
+            deployServiceEntity.setProperty(deployResult.getProperty());
+            deployServiceEntity.setDeployResourceList(
                     getDeployResourceEntityList(deployResult.getResources(), deployServiceEntity));
             deployServiceStorage.store(deployServiceEntity);
         } catch (Exception e) {
@@ -243,10 +338,11 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
             DeployResult deployResult = deployment.destroy(deployTask);
             deployServiceEntity.setServiceState(ServiceState.DESTROY_SUCCESS);
             List<DeployResource> resources = deployResult.getResources();
+            deployServiceEntity.setProperty(deployResult.getProperty());
             if (CollectionUtils.isEmpty(resources)) {
                 deployResourceStorage.deleteByDeployServiceId(deployServiceEntity.getId());
             } else {
-                deployServiceEntity.setDeployResourceEntity(
+                deployServiceEntity.setDeployResourceList(
                         getDeployResourceEntityList(resources, deployServiceEntity));
             }
             deployServiceStorage.store(deployServiceEntity);
@@ -279,39 +375,46 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
      * Get deploy service detail by id.
      *
      * @param id ID of deploy service.
-     * @return deployService
+     * @return serviceDetailVo
      */
-    public DeployServiceEntity getDeployServiceDetail(UUID id) {
-        return deployServiceStorage.findDeployServiceById(id);
-
+    public ServiceDetailVo getDeployServiceDetail(UUID id) {
+        DeployServiceEntity deployServiceEntity = deployServiceStorage.findDeployServiceById(id);
+        if (Objects.isNull(deployServiceEntity)) {
+            return null;
+        }
+        ServiceDetailVo serviceDetailVo = new ServiceDetailVo();
+        BeanUtils.copyProperties(deployServiceEntity, serviceDetailVo);
+        if (!CollectionUtils.isEmpty(deployServiceEntity.getDeployResourceList())) {
+            List<DeployResource> deployResources =
+                    EntityTransUtils.transResourceEntity(
+                            deployServiceEntity.getDeployResourceList());
+            serviceDetailVo.setDeployResources(deployResources);
+        }
+        return serviceDetailVo;
     }
 
 
     private void fillHandler(DeployTask deployTask) {
         // Find the deployment plugin and resource handler
-        Optional<OrchestratorPlugin> pluginOptional =
-                this.plugins.stream()
-                        .filter(plugin -> plugin.getCsp() == deployTask.getCreateRequest().getCsp())
-                        .findFirst();
-        if (pluginOptional.isEmpty() || Objects.isNull(pluginOptional.get().getResourceHandler())) {
-            throw new RuntimeException("Can't find suitable plugin and resource handler for the "
-                    + "Task.");
+        Csp csp = deployTask.getCreateRequest().getCsp();
+        OrchestratorPlugin plugin = pluginMap.get(csp);
+
+        if (Objects.isNull(plugin) || Objects.isNull(plugin.getResourceHandler())) {
+            throw new RuntimeException(
+                    "Can't find suitable plugin and resource handler for the "
+                            + "Task.");
         }
-        deployTask.setDeployResourceHandler(pluginOptional.get().getResourceHandler());
+        deployTask.setDeployResourceHandler(plugin.getResourceHandler());
     }
 
     private Deployment getDeployment(DeployTask deployTask) {
         DeployerKind deployerKind = deployTask.getOcl().getDeployment().getKind();
-        Optional<Deployment> deploymentOptional =
-                this.deployers.stream()
-                        .filter(deployer -> deployer.getDeployerKind() == deployerKind)
-                        .findFirst();
-        if (deploymentOptional.isEmpty()) {
+        Deployment deployment = deploymentMap.get(deployerKind);
+        if (Objects.isNull(deployment)) {
             throw new RuntimeException("Can't find suitable deployer for the Task.");
         }
-        return deploymentOptional.get();
+        return deployment;
     }
-
 
     /**
      * generate OpenApi for registered service using the ID.
@@ -326,8 +429,40 @@ public class OrchestratorService implements ApplicationListener<ApplicationEvent
             throw new IllegalArgumentException(String.format("Registered service with id %s not "
                     + "existed.", id));
         }
-        // TODO find the path of swagger-ui.html of the registered by id or generate swagger-ui.html
-        return null;
+        String rootPath = System.getProperty("user.dir");
+        File folder = new File(rootPath + "/openapi");
+        File file = new File(folder, uuid + ".html");
+        if (file.exists()) {
+            return "http://localhost:8080/openapi/" + uuid + ".html";
+        } else {
+            return openApiUtil.creatServiceApi(registerService);
+        }
+    }
+
+    /**
+     * delete OpenApi for registered service using the ID.
+     *
+     * @param id ID of registered service.
+     */
+    @Async("taskExecutor")
+    public void deleteOpenApi(String id) {
+        openApiUtil.deleteServiceApi(id);
+    }
+
+    /**
+     * update OpenApi for registered service using the ID.
+     *
+     * @param id ID of registered service.
+     */
+    @Async("taskExecutor")
+    public void updateOpenApi(String id) {
+        UUID uuid = UUID.fromString(id);
+        RegisterServiceEntity registerService = registerServiceStorage.getRegisterServiceById(uuid);
+        if (Objects.isNull(registerService) || Objects.isNull(registerService.getOcl())) {
+            throw new IllegalArgumentException(String.format("Registered service with id %s not "
+                    + "existed.", id));
+        }
+        openApiUtil.updateServiceApi(registerService);
     }
 
 
