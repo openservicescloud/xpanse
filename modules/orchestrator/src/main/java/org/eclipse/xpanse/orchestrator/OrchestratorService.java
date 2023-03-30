@@ -28,13 +28,17 @@ import org.eclipse.xpanse.modules.models.enums.ServiceState;
 import org.eclipse.xpanse.modules.models.resource.DeployVariable;
 import org.eclipse.xpanse.modules.models.service.DeployResource;
 import org.eclipse.xpanse.modules.models.service.DeployResult;
+import org.eclipse.xpanse.modules.models.service.MonitorDataResponse;
+import org.eclipse.xpanse.modules.models.service.MonitorResource;
 import org.eclipse.xpanse.modules.models.utils.DeployVariableValidator;
 import org.eclipse.xpanse.modules.models.view.ServiceVo;
+import org.eclipse.xpanse.modules.monitor.Monitor;
 import org.eclipse.xpanse.orchestrator.register.RegisterServiceStorage;
 import org.eclipse.xpanse.orchestrator.service.DeployResourceStorage;
 import org.eclipse.xpanse.orchestrator.service.DeployServiceStorage;
 import org.slf4j.MDC;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.Async;
@@ -47,14 +51,18 @@ import org.springframework.util.CollectionUtils;
  * managed service in the respective infrastructure as defined in the OCL.
  */
 @Slf4j
+@Transactional
 @Component
 public class OrchestratorService {
+
 
     private static final String TASK_ID = "TASK_ID";
 
     private final Map<Csp, OrchestratorPlugin> pluginMap = new ConcurrentHashMap<>();
 
     private final Map<DeployerKind, Deployment> deploymentMap = new ConcurrentHashMap<>();
+
+    private final Map<Csp, Monitor> monitorServiceMap = new ConcurrentHashMap<>();
 
     @Resource
     private ApplicationContext applicationContext;
@@ -66,6 +74,9 @@ public class OrchestratorService {
     private DeployResourceStorage deployResourceStorage;
     @Resource
     private DeployVariableValidator deployVariableValidator;
+
+    @Value("${monitor.data.agent.enable:false}")
+    private Boolean monitorAgentEnabled;
 
     /**
      * Get all OrchestratorPlugin group by Csp.
@@ -89,6 +100,18 @@ public class OrchestratorService {
         applicationContext.getBeansOfType(Deployment.class)
                 .forEach((key, value) -> deploymentMap.put(value.getDeployerKind(), value));
         return deploymentMap;
+    }
+
+    /**
+     * Get all Monitor implements group by Csp.
+     *
+     * @return monitorMap
+     */
+    @Bean
+    public Map<Csp, Monitor> monitorMap() {
+        applicationContext.getBeansOfType(Monitor.class)
+                .forEach((key, value) -> monitorServiceMap.put(value.getCsp(), value));
+        return monitorServiceMap;
     }
 
     /**
@@ -141,6 +164,39 @@ public class OrchestratorService {
         fillHandler(deployTask);
         // get the deployment.
         return getDeployment(deployTask);
+    }
+
+    /**
+     * The method to get service monitor.
+     *
+     * @param id Deploy service UUID.
+     * @param fromTime Start time.
+     * @param toTime End time.
+     */
+    public MonitorResource monitor(UUID id, String fromTime, String toTime) {
+        // Find the deployed service.
+        DeployServiceEntity deployServiceEntity =
+                deployServiceStorage.findDeployServiceById(id);
+        if (Objects.isNull(deployServiceEntity) || Objects.isNull(
+                deployServiceEntity.getCreateRequest()) || Objects.isNull(
+                deployServiceEntity.getDeployResourceEntity())) {
+            throw new RuntimeException(String.format("Deployed service with id %s not found",
+                    id));
+        }
+        Csp csp = deployServiceEntity.getCreateRequest().getCsp();
+        Monitor monitor = monitorServiceMap.get(csp);
+        if (Objects.isNull(monitor)) {
+            throw new RuntimeException("Can't find suitable monitor for the Task.");
+        }
+        MonitorResource monitorResource = new MonitorResource();
+        List<MonitorDataResponse> cpu = monitor.cpuUsage(deployServiceEntity, monitorAgentEnabled,
+                fromTime, toTime);
+        List<MonitorDataResponse> mem = monitor.memUsage(deployServiceEntity, monitorAgentEnabled,
+                fromTime, toTime);
+        monitorResource.setCpu(cpu);
+        monitorResource.setMem(mem);
+        return monitorResource;
+
     }
 
     /**
@@ -283,10 +339,13 @@ public class OrchestratorService {
 
     private void fillHandler(DeployTask deployTask) {
         // Find the deployment plugin and resource handler
-        OrchestratorPlugin plugin = pluginMap.get(deployTask.getCreateRequest().getCsp());
+        Csp csp = deployTask.getCreateRequest().getCsp();
+        OrchestratorPlugin plugin = pluginMap.get(csp);
+
         if (Objects.isNull(plugin) || Objects.isNull(plugin.getResourceHandler())) {
-            throw new RuntimeException("Can't find suitable plugin and resource handler for the "
-                    + "Task.");
+            throw new RuntimeException(
+                    "Can't find suitable plugin and resource handler for the "
+                            + "Task.");
         }
         deployTask.setDeployResourceHandler(plugin.getResourceHandler());
     }
