@@ -3,12 +3,6 @@ import { Space, Table, Tag } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import axios from "axios";
 
-
-  axios.get('http://192.168.0.97:8080/xpanse/health')
-  .then(function (response){
-    console.log(response);
-  })
-
 interface DataType {
   key: string;
   name: string;

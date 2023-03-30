@@ -39,6 +39,13 @@ function App() {
                  </Protected>
                }
         />
+        <Route path={'/billing'}
+               element={
+                 <Protected>
+                   <Billing/>
+                 </Protected>
+               }
+        />
         <Route path={'/integration-endpoints'}
                element={
                  <Protected>
