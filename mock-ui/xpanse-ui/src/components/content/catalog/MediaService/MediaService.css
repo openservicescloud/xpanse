@@ -1,0 +1,28 @@
+.xpanse-service-layout-content{
+  display: flex;
+  margin: 20px;
+  padding: 20px;
+  width: 1500px;
+  height: 3000px;
+}
+.xpanse-service-layout-product{
+  float: left;
+  width: 30%;
+  height: 100px;
+}
+.xpanse-service-layout-supplier{
+  float: right;
+  width: 70%;
+  height: 100px;
+}
+.xpanse-servicet-supplier-unselected{
+  display: none
+}
+.xpanse-service-supplier-selected{
+  float: right;
+  width: 70%;
+  height: 100px;
+}
+.text-title{
+  width: 200px;
+}
