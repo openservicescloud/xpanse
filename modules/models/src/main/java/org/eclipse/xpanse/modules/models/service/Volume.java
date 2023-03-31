@@ -17,7 +17,7 @@ import lombok.ToString;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @Data
-public class Disk extends DeployResource {
+public class Volume extends DeployResource {
 
     public String size;
     public String type;

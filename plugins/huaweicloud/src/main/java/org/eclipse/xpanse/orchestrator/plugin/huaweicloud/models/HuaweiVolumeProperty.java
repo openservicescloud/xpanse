@@ -12,12 +12,12 @@ import java.util.HashMap;
 /**
  * Huawei cloud vm property.
  */
-public class HuaweiDiskProperty extends HashMap<String, String> {
+public class HuaweiVolumeProperty extends HashMap<String, String> {
 
     /**
      * Init method to put property key and value.
      */
-    public HuaweiDiskProperty() {
+    public HuaweiVolumeProperty() {
 
         this.put("size", "size");
         this.put("type", "volume_type");

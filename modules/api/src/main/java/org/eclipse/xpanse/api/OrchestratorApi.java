@@ -16,7 +16,6 @@ import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.xpanse.api.response.Response;
-import org.eclipse.xpanse.modules.database.register.RegisterServiceEntity;
 import org.eclipse.xpanse.modules.deployment.Deployment;
 import org.eclipse.xpanse.modules.deployment.deployers.terraform.DeployTask;
 import org.eclipse.xpanse.modules.models.SystemStatus;
@@ -229,7 +228,7 @@ public class OrchestratorApi {
     @GetMapping(value = "/register",
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public List<RegisterServiceEntity> listRegisteredServices(
+    public List<OclDetailVo> listRegisteredServices(
             @Parameter(name = "categoryName", description = "category of the service")
             @RequestParam(name = "categoryName", required = false) String categoryName,
             @Parameter(name = "cspName", description = "name of the service provider")
@@ -248,12 +247,12 @@ public class OrchestratorApi {
         query.setServiceName(serviceName);
         query.setServiceVersion(serviceVersion);
         log.info("List registered service with query model {}", query);
-        List<RegisterServiceEntity> serviceEntities =
+        List<OclDetailVo> registerVos =
                 registerService.queryRegisteredServices(query);
         String successMsg = String.format("List registered service with query model %s "
                 + "success.", query);
         log.info(successMsg);
-        return serviceEntities;
+        return registerVos;
     }
 
 
