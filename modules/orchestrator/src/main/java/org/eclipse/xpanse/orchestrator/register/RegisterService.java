@@ -8,7 +8,6 @@ package org.eclipse.xpanse.orchestrator.register;
 
 import java.util.List;
 import java.util.UUID;
-import org.eclipse.xpanse.modules.database.register.RegisterServiceEntity;
 import org.eclipse.xpanse.modules.models.query.RegisteredServiceQuery;
 import org.eclipse.xpanse.modules.models.resource.Ocl;
 import org.eclipse.xpanse.modules.models.view.CategoryOclVo;
@@ -68,7 +67,7 @@ public interface RegisterService {
      * @param query the query model for search registered service.
      * @return list of RegisterServiceEntity
      */
-    List<RegisterServiceEntity> queryRegisteredServices(RegisteredServiceQuery query);
+    List<OclDetailVo> queryRegisteredServices(RegisteredServiceQuery query);
 
     /**
      * Search registered service tree by query model.
