@@ -28,9 +28,9 @@ import org.eclipse.xpanse.modules.deployment.deployers.terraform.resource.TfStat
 import org.eclipse.xpanse.modules.models.enums.DeployResourceKind;
 import org.eclipse.xpanse.modules.models.service.DeployResource;
 import org.eclipse.xpanse.modules.models.service.DeployResult;
-import org.eclipse.xpanse.modules.models.service.Disk;
 import org.eclipse.xpanse.modules.models.service.PublicIp;
 import org.eclipse.xpanse.modules.models.service.Vm;
+import org.eclipse.xpanse.modules.models.service.Volume;
 import org.eclipse.xpanse.orchestrator.plugin.huaweicloud.models.HuaweiResourceProperty;
 import org.springframework.stereotype.Component;
 
@@ -89,13 +89,13 @@ public class HuaweiTerraformResourceHandler implements DeployResourceHandler {
                 }
                 if (StringUtils.equals(serviceType, "huaweicloud_evs_volume")) {
                     for (TfStateResourceInstance instance : tfStateResource.getInstances()) {
-                        DeployResource deployResource = new Disk();
+                        DeployResource deployResource = new Volume();
                         deployResource.setProperty(new HashMap<>());
                         deployResource.getProperty()
                                 .put("create", String.valueOf(create));
                         deployResource.getProperty()
                                 .put("service_type", serviceType);
-                        deployResource.setKind(DeployResourceKind.DISK);
+                        deployResource.setKind(DeployResourceKind.VOLUME);
                         fillResourceInfo(instance, deployResource);
                         deployResourceList.add(deployResource);
                     }
@@ -128,7 +128,7 @@ public class HuaweiTerraformResourceHandler implements DeployResourceHandler {
                             String chargeMode = bandwidth.get(0).get("charge_mode").toString();
                             deployResource.getProperty()
                                     .put("charge_mode", chargeMode);
-                            deployResource.setKind(DeployResourceKind.PUBLICIP);
+                            deployResource.setKind(DeployResourceKind.PUBLIC_IP);
                             fillResourceInfo(instance, deployResource);
                             deployResourceList.add(deployResource);
                         }
@@ -140,7 +140,7 @@ public class HuaweiTerraformResourceHandler implements DeployResourceHandler {
                                     .put("create", String.valueOf(create));
                             deployResource.getProperty()
                                     .put("service_type", serviceType);
-                            deployResource.setKind(DeployResourceKind.PUBLICIP);
+                            deployResource.setKind(DeployResourceKind.PUBLIC_IP);
                             fillResourceInfo(instance, deployResource);
                             deployResourceList.add(deployResource);
                         }

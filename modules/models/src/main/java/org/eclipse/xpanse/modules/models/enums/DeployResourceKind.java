@@ -17,9 +17,10 @@ import org.apache.commons.lang3.StringUtils;
 public enum DeployResourceKind {
     VM("vm"),
     CONTAINER("container"),
-    PUBLICIP("public_ip"),
+    PUBLIC_IP("publicIP"),
     VPC("vpc"),
-    DISK("disk");
+    VOLUME("volume"),
+    UNKNOWN("unknown");
 
     private final String kind;
 
