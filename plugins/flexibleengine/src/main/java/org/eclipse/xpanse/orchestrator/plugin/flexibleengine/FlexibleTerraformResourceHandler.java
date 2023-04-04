@@ -74,7 +74,7 @@ public class FlexibleTerraformResourceHandler implements DeployResourceHandler {
                     deployResource.setProperty(new HashMap<>());
                     deployResource.getProperty()
                             .put("ip", (String) instance.getAttributes().get("public_ip"));
-                    deployResource.setKind(DeployResourceKind.PUBLICIP);
+                    deployResource.setKind(DeployResourceKind.PUBLIC_IP);
                     xpResourceList.add(deployResource);
                 }
             }
