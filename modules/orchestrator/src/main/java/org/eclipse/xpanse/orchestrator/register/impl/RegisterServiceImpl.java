@@ -6,6 +6,7 @@
 
 package org.eclipse.xpanse.orchestrator.register.impl;
 
+import jakarta.annotation.Resource;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,8 +27,8 @@ import org.eclipse.xpanse.modules.models.view.ProviderOclVo;
 import org.eclipse.xpanse.modules.models.view.VersionOclVo;
 import org.eclipse.xpanse.orchestrator.register.RegisterService;
 import org.eclipse.xpanse.orchestrator.register.RegisterServiceStorage;
+import org.eclipse.xpanse.orchestrator.utils.IconProcessorUtil;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -37,14 +38,10 @@ import org.springframework.util.CollectionUtils;
 @Component
 public class RegisterServiceImpl implements RegisterService {
 
-    private final RegisterServiceStorage storage;
-    private final OclLoader oclLoader;
-
-    @Autowired
-    public RegisterServiceImpl(RegisterServiceStorage registerServiceStorage, OclLoader oclLoader) {
-        this.storage = registerServiceStorage;
-        this.oclLoader = oclLoader;
-    }
+    @Resource
+    private RegisterServiceStorage storage;
+    @Resource
+    private OclLoader oclLoader;
 
     /**
      * Update registered service using id and the ocl file url.
@@ -78,6 +75,9 @@ public class RegisterServiceImpl implements RegisterService {
 
     private RegisterServiceEntity getNewRegisterServiceEntity(Ocl ocl) {
         RegisterServiceEntity entity = new RegisterServiceEntity();
+        String icon = ocl.getIcon();
+        String newIcon = IconProcessorUtil.getIcon(icon);
+        ocl.setIcon(newIcon.replaceAll("\r|\n", ""));
         entity.setName(StringUtils.lowerCase(ocl.getName()));
         entity.setVersion(StringUtils.lowerCase(ocl.getServiceVersion()));
         entity.setCsp(ocl.getCloudServiceProvider().getName());
@@ -95,8 +95,12 @@ public class RegisterServiceImpl implements RegisterService {
     @Override
     public UUID registerService(Ocl ocl) {
         RegisterServiceEntity newEntity = getNewRegisterServiceEntity(ocl);
-        if (Objects.nonNull(storage.findRegisteredService(newEntity))) {
-            throw new IllegalArgumentException("Service already registered.");
+        if (!newEntity.getOcl().getIcon().startsWith("data:image/png;base64,")) {
+            throw new IllegalArgumentException(newEntity.getOcl().getIcon());
+        } else {
+            if (Objects.nonNull(storage.findRegisteredService(newEntity))) {
+                throw new IllegalArgumentException("Service already registered.");
+            }
         }
         storage.store(newEntity);
         return newEntity.getId();
