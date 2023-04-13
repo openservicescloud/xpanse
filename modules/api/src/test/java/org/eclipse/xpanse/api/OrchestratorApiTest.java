@@ -7,6 +7,8 @@
 package org.eclipse.xpanse.api;
 
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponseWrapper;
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -63,57 +65,56 @@ public class OrchestratorApiTest {
     @Test
     public void testRegister() throws Exception {
         OclLoader oclLoader = new OclLoader();
-        Ocl ocl = oclLoader.getOcl(new URL("file:./target/test-classes/ocl_test.yaml"));
-        //b2a7acff-7484-40da-97ee-e0411f227ccb      kafka
-        //ac0fde89-2304-49b8-a492-3bd82d25acd5      kafka2
+        Ocl ocl = oclLoader.getOcl(new URL("file:./target/test-classes/ocl_test1.yaml"));
+        //0efc424a-02a4-4a6a-86d8-42b5cf0d4f08      kafka
         UUID uuidRegister = orchestratorApi.register(ocl);
+        Thread.sleep(5000);
         log.error(uuidRegister.toString());
         Assertions.assertNotNull(uuidRegister);
     }
 
-    @Disabled
     @Test
     public void testUpdate() throws Exception {
         OclLoader oclLoader = new OclLoader();
         Ocl ocl = oclLoader.getOcl(new URL("file:./target/test-classes/ocl_test2.yaml"));
-        UUID uuid = UUID.fromString("118185c0-fbb3-4431-9b3d-aa25a34ec6f3");
+        UUID uuid = UUID.fromString("0efc424a-02a4-4a6a-86d8-42b5cf0d4f08");
         Response response = orchestratorApi.update(uuid.toString(), ocl);
+        Thread.sleep(5000);
         Assertions.assertTrue(response.getSuccess());
     }
 
     @Test
     public void testFetch() throws Exception {
         String oclLocation = "file:./target/test-classes/ocl_test3.yaml";
-        //57fb478c-9aae-4549-b7c6-3b65a8990092
+        //86f8a899-8a32-4299-a039-79af75e3e1c9   kafka2
         UUID fetchUuid = orchestratorApi.fetch(oclLocation);
+        Thread.sleep(5000);
         log.error(fetchUuid.toString());
         Assertions.assertNotNull(fetchUuid);
     }
 
-    @Disabled
     @Test
     public void testFetchUpdate() throws Exception {
         String oclLocation = "file:./target/test-classes/ocl_test4.yaml";
-        UUID uuid = UUID.fromString("57fb478c-9aae-4549-b7c6-3b65a8990092");
+        UUID uuid = UUID.fromString("86f8a899-8a32-4299-a039-79af75e3e1c9");
         Response response = orchestratorApi.fetchUpdate(uuid.toString(), oclLocation);
+        Thread.sleep(5000);
         Assertions.assertTrue(response.getSuccess());
     }
 
-    @Disabled
     @Test
     public void testUnregister() {
-        UUID uuid = UUID.fromString("57fb478c-9aae-4549-b7c6-3b65a8990092");
+        UUID uuid = UUID.fromString("0efc424a-02a4-4a6a-86d8-42b5cf0d4f08");
         Response response = orchestratorApi.unregister(uuid.toString());
         Assertions.assertTrue(response.getSuccess());
     }
 
     @Test
-    public void testListRegisteredServices() throws Exception {
+    public void testListRegisteredServices() {
         String categoryName = "middleware";
         String cspName = "huawei";
         String serviceName = "kafka";
         String serviceVersion = "v1.0";
-
         List<RegisteredServiceVo> registeredServiceVos = orchestratorApi.listRegisteredServices(
                 categoryName, cspName, serviceName, serviceVersion);
         log.error(registeredServiceVos.toString());
@@ -129,11 +130,9 @@ public class OrchestratorApiTest {
         Assertions.assertNotNull(categoryOclVos);
     }
 
-    @Disabled
     @Test
     public void testDetail() {
-        UUID uuid = UUID.fromString("918c59ba-7bb0-4899-8d59-d07e8ea9bba0");
-
+        UUID uuid = UUID.fromString("0efc424a-02a4-4a6a-86d8-42b5cf0d4f08");
         OclDetailVo detail = orchestratorApi.detail(uuid.toString());
         log.error(detail.toString());
         Assertions.assertNotNull(detail);
@@ -150,37 +149,24 @@ public class OrchestratorApiTest {
     @Disabled
     @Test
     public void testServiceDetail() {
-        UUID uuid = UUID.fromString("ac0fde89-2304-49b8-a492-3bd82d25acd5");
-
+        UUID uuid = UUID.fromString("b0766941-5c5e-44db-ae84-66678a9a59c1");
         ServiceDetailVo serviceDetailVo = orchestratorApi.serviceDetail(uuid.toString());
         log.error(serviceDetailVo.toString());
         Assertions.assertNotNull(serviceDetailVo);
     }
 
-    @Disabled
     @Test
     public void testServices() {
-        ServiceVo serviceVo = new ServiceVo();
-        serviceVo.setId(UUID.randomUUID());
-        serviceVo.setCategory(Category.COMPUTE);
-        serviceVo.setName("kafka");
-        serviceVo.setVersion("1.0");
-        serviceVo.setCsp(Csp.HUAWEI);
-        serviceVo.setFlavor("3-2-node-without-zookeeper");
-        serviceVo.setServiceState(ServiceState.REGISTERED);
-        serviceVo.setCreateTime(new Date());
-        serviceVo.setLastModifiedTime(new Date());
-        List serviceVoList = new ArrayList<>();
-        serviceVoList.add(serviceVo);
         List<ServiceVo> services = orchestratorApi.services();
         log.error(services.toString());
+        Assertions.assertNotNull(services);
     }
 
     @Disabled
     @Test
     public void testDeploy() throws Exception {
         OclLoader oclLoader = new OclLoader();
-        Ocl ocl = oclLoader.getOcl(new URL("file:./target/test-classes/ocl_test.yaml"));
+        Ocl ocl = oclLoader.getOcl(new URL("file:./target/test-classes/ocl_test1.yaml"));
         CreateRequest createRequest = new CreateRequest();
         createRequest.setId(UUID.fromString("2c2e1530-87bb-49c8-b109-f5146ec9df4b"));
         createRequest.setCategory(Category.MIDDLEWARE);
@@ -204,11 +190,14 @@ public class OrchestratorApiTest {
         Assertions.assertTrue(response.getSuccess());
     }
 
-    @Disabled
     @Test
     public void testOpenApi() throws IOException {
-        String uuid = UUID.fromString("b2a7acff-7484-40da-97ee-e0411f227ccb").toString();
-        HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
-        orchestratorApi.openApi(uuid, response);
+        String uuid = UUID.fromString("0efc424a-02a4-4a6a-86d8-42b5cf0d4f08").toString();
+        HttpServletResponse realResponse = new HttpServletResponseWrapper(Mockito.mock(HttpServletResponse.class));
+        orchestratorApi.openApi(uuid, realResponse);
+        String openApiDir = System.getProperty("user.dir");
+        String openApiPath = openApiDir + "/openapi/" + uuid +".html";
+        File file = new File(openApiPath);
+        Assertions.assertTrue(file.exists());
     }
 }

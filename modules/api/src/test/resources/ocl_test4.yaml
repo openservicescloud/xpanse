@@ -71,7 +71,7 @@ deployment:
       kind: env
       type: string
       mandatory: false
-      validator: length(1-256)
+      validator: length(2-256)
     - name: vpc_id
       description: The vpc id.
       kind: variable
