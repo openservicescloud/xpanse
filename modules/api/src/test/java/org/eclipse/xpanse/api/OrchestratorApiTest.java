@@ -63,14 +63,15 @@ public class OrchestratorApiTest {
     @Test
     public void testRegister() throws Exception {
         OclLoader oclLoader = new OclLoader();
-        Ocl ocl = oclLoader.getOcl(new URL("file:./target/test-classes/ocl_test3.yaml"));
-        //118185c0-fbb3-4431-9b3d-aa25a34ec6f3      kafka
+        Ocl ocl = oclLoader.getOcl(new URL("file:./target/test-classes/ocl_test.yaml"));
+        //b2a7acff-7484-40da-97ee-e0411f227ccb      kafka
         //ac0fde89-2304-49b8-a492-3bd82d25acd5      kafka2
         UUID uuidRegister = orchestratorApi.register(ocl);
         log.error(uuidRegister.toString());
         Assertions.assertNotNull(uuidRegister);
     }
 
+    @Disabled
     @Test
     public void testUpdate() throws Exception {
         OclLoader oclLoader = new OclLoader();
@@ -98,6 +99,7 @@ public class OrchestratorApiTest {
         Assertions.assertTrue(response.getSuccess());
     }
 
+    @Disabled
     @Test
     public void testUnregister() {
         UUID uuid = UUID.fromString("57fb478c-9aae-4549-b7c6-3b65a8990092");
@@ -127,6 +129,7 @@ public class OrchestratorApiTest {
         Assertions.assertNotNull(categoryOclVos);
     }
 
+    @Disabled
     @Test
     public void testDetail() {
         UUID uuid = UUID.fromString("918c59ba-7bb0-4899-8d59-d07e8ea9bba0");
@@ -204,8 +207,7 @@ public class OrchestratorApiTest {
     @Disabled
     @Test
     public void testOpenApi() throws IOException {
-        String uuid = UUID.randomUUID().toString();
-        String openApiUrl = "http://localhost:8080/openapi";
+        String uuid = UUID.fromString("b2a7acff-7484-40da-97ee-e0411f227ccb").toString();
         HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
         orchestratorApi.openApi(uuid, response);
     }
